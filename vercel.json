@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/Api/upi.php",
+      "destination": "/api"
+    },
+    {
+      "source": "/api/upi.php",
+      "destination": "/api"
+    }
+  ]
+}
