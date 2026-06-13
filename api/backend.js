@@ -3,20 +3,20 @@ import { getDatabase, ref, get, set, update, runTransaction, increment } from "f
 
 // 1. Updated Database Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCbP79K6qh0NYiG7aECjE0yFkyUbf1ETMo",
-  authDomain: "ng-wallet-1ef7e.firebaseapp.com",
-  databaseURL: "https://ng-wallet-1ef7e-default-rtdb.firebaseio.com",
-  projectId: "ng-wallet-1ef7e",
-  storageBucket: "ng-wallet-1ef7e.firebasestorage.app",
-  messagingSenderId: "535409185016",
-  appId: "1:535409185016:web:2572a5edaeb80266302b0d"
+  apiKey: "AIzaSyD5v9bzx87FKIaRAIOzA9OGxIvRH67_Eto",
+  authDomain: "ng-wallet-597c4.firebaseapp.com",
+  projectId: "ng-wallet-597c4",
+  storageBucket: "ng-wallet-597c4.firebasestorage.app",
+  messagingSenderId: "952149975442",
+  appId: "1:952149975442:web:1bc2336d313e887227a14b",
+  measurementId: "G-P7YEY71CPT"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // 2. Updated Bot Token
-const BOT_TOKEN = "8949928597:AAEwJXfEzzLKs_YlBvLIt3Gowk3HLL1fsL4";
+const BOT_TOKEN = "8949928597:AAHE1aY8qjxhHyH6kJuJKGWescYlsihgIqM";
 
 function getExactDate() {
     return new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
