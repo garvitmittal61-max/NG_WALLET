@@ -330,7 +330,7 @@ function updateProfileDashboardUI() {
     if (pName) pName.innerHTML = currentUser.name;
     if (pLblName) pLblName.innerText = currentUser.name;
     if (pLblPhone) pLblPhone.innerText = currentUser.phone;
-    if (pLblPin) pLblPin.innerText = currentUser.pin || "****";
+    if (pLblPin) pLblPin.innerText = currentUser.pin || "*XX*";
     
     if (pLblCustom) {
         if (currentUser.customId) { pLblCustom.innerText = currentUser.customId; pLblCustom.className = "font-black text-sm text-blue-500 font-mono"; } 
