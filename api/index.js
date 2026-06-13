@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         const data = { ...req.query, ...(req.body || {}) };
 
         if (req.method === 'GET' && Object.keys(data).length === 0) {
-            return res.redirect(302, 'https://ng-solutions.vercel.app');
+            return res.redirect(302, 'http://ng-wallet-pn77.vercel.app');
         }
 
         // ==========================================
