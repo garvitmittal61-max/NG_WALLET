@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
 
     if (req.method === 'GET') {
-        return res.redirect(302, 'https://ng-wallet-pn77.vercel.app');
+        return res.redirect(302, 'http://ng-wallet-pn77.vercel.app');
     }
 
     if (req.method === 'OPTIONS') return res.status(200).end();
