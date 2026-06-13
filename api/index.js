@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, query, orderByChild, equalTo, update, increment } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyANPpqVb76h_fAgcSNs4btyV1pgRicFKWw",
-  authDomain: "ng-solutions-1c68b.firebaseapp.com",
-  databaseURL: "https://ng-solutions-1c68b-default-rtdb.firebaseio.com",
-  projectId: "ng-solutions-1c68b",
-  storageBucket: "ng-solutions-1c68b.firebasestorage.app",
-  messagingSenderId: "256064070983",
-  appId: "1:256064070983:web:2b3a4abff5d413cae31862"
+  apiKey: "AIzaSyCXs6oK4gIh2LoZIQk2DRx6vs_uXJ1dTAU",
+  authDomain: "tournament-b2107.firebaseapp.com",
+  databaseURL: "https://tournament-b2107-default-rtdb.firebaseio.com",
+  projectId: "tournament-b2107",
+  storageBucket: "tournament-b2107.firebasestorage.app",
+  messagingSenderId: "432820947483",
+  appId: "1:432820947483:web:59a98c12108f55042e86be",
+  measurementId: "G-M12VPSMC98"
 };
 
 const app = initializeApp(firebaseConfig);
