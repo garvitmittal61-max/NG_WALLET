@@ -16,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // NEW BOT TOKEN
-const BOT_TOKEN = "8949928597:AAE_tqWVa6dzmEQOg2QCrkYPUguSPNjiZiE";
+const BOT_TOKEN = "8949928597:AAEwJXfEzzLKs_YlBvLIt3Gowk3HLL1fsL4";
 
 function getExactDate() {
     return new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
