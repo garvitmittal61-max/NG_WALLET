@@ -3,13 +3,17 @@ import { getDatabase, ref, get, query, orderByChild, equalTo, update, increment 
 
 // NEW DATABASE CONFIGURATION
 const firebaseConfig = {
-  apiKey: "AIzaSyD5v9bzx87FKIaRAIOzA9OGxIvRH67_Eto",
-  authDomain: "ng-wallet-597c4.firebaseapp.com",
-  projectId: "ng-wallet-597c4",
-  storageBucket: "ng-wallet-597c4.firebasestorage.app",
-  messagingSenderId: "952149975442",
-  appId: "1:952149975442:web:1bc2336d313e887227a14b",
-  measurementId: "G-P7YEY71CPT"
+configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDa3GLjZ_MZ5bSJDGneE2QyLmuhRmQ0SDw",
+  authDomain: "ng-wallet-77227.firebaseapp.com",
+  databaseURL: "https://ng-wallet-77227-default-rtdb.firebaseio.com",
+  projectId: "ng-wallet-77227",
+  storageBucket: "ng-wallet-77227.firebasestorage.app",
+  messagingSenderId: "412589592184",
+  appId: "1:412589592184:web:1b3bfc08f67e699e9da78d",
+  measurementId: "G-7XQ764S5D3"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
