@@ -1,7 +1,11 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, get, query, orderByChild, equalTo, update, increment } from "firebase/database";
+// api/index.js
+import express from 'express';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, get, set, update, push, runTransaction } from 'firebase/database';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// ==========================================
+// Firebase Configuration (from your project)
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDa3GLjZ_MZ5bSJDGneE2QyLmuhRmQ0SDw",
   authDomain: "ng-wallet-77227.firebaseapp.com",
@@ -12,219 +16,527 @@ const firebaseConfig = {
   appId: "1:412589592184:web:1b3bfc08f67e699e9da78d",
   measurementId: "G-7XQ764S5D3"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// NEW BOT TOKEN
-const BOT_TOKEN = "8231479597:AAF36dz-AcERBw34QITLXlizDMtlGEFmUXM";
+const router = express.Router();
 
-function getExactDate() {
-    return new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+// ==========================================
+// Helper Functions
+// ==========================================
+function generateInvoiceId() {
+  return 'INV_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
 }
 
-async function sendTelegramMsg(chatId, text) {
-    try {
-        if (!chatId) return false;
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'HTML' })
-        });
-        return true;
-    } catch (e) { return false; }
+function validatePhone(phone) {
+  return /^[0-9]{10}$/.test(phone);
 }
 
-export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Content-Type', 'application/json');
+// ==========================================
+// EXISTING API ENDPOINTS (from your repo)
+// ==========================================
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-
-    try {
-        // Collect parameters from either GET (req.query) or POST (req.body)
-        const data = { ...req.query, ...(req.body || {}) };
-
-        // REDIRECT FIX: If someone visits the API URL without any valid parameters, redirect to the home page.
-        if (req.method === 'GET' && !req.query.key && !req.query.token && !req.query.tguserid && !req.query.transaction && req.query.leaderboard === undefined) {
-            return res.redirect(302, 'http://ng-wallet-pn77.vercel.app');
-        }
-
-        // ==========================================
-        // API 1: TELEGRAM USERID BALANCE
-        // ==========================================
-        if (data.tguserid) {
-            const tgId = String(data.tguserid).trim();
-            const usersRef = ref(db, "users");
-            const userSnap = await get(query(usersRef, orderByChild("tgUserId"), equalTo(tgId)));
-            
-            if (!userSnap.exists()) return res.status(200).json({ status: "error", message: "invalid user" });
-            
-            let userInfo = null;
-            userSnap.forEach((child) => {
-                userInfo = { phone: child.key, name: child.val().name || "User", balance: Number(child.val().balance) || 0, tgUserId: child.val().tgUserId };
-            });
-            return res.status(200).json({ status: "success", data: userInfo });
-        }
-
-        // ==========================================
-        // API 2: LEADERBOARD TOP 3 USERS
-        // ==========================================
-        if (data.leaderboard !== undefined) {
-            const usersSnap = await get(ref(db, "users"));
-            let usersList = [];
-            if (usersSnap.exists()) {
-                usersSnap.forEach((child) => {
-                    const u = child.val();
-                    if (!u.isBanned) usersList.push({ name: u.name || "Unknown", phone: child.key, balance: Number(u.balance) || 0 });
-                });
-            }
-            usersList.sort((a, b) => b.balance - a.balance);
-            return res.status(200).json({ status: "success", data: usersList.slice(0, 3) });
-        }
-
-        // ==========================================
-        // API 3: TRANSACTION DETAILS
-        // ==========================================
-        if (data.transaction) {
-            const txnId = String(data.transaction).trim();
-            const txnSnap = await get(ref(db, `transactions/${txnId}`));
-            if (!txnSnap.exists()) return res.status(200).json({ status: "error", message: "invalid transaction" });
-            return res.status(200).json({ status: "success", data: txnSnap.val() });
-        }
-
-        // ==========================================
-        // EXTERNAL API: PAYMENTS & WITHDRAWALS LOGIC
-        // ==========================================
-        const { key, token, paytm, amount, comment, number, upi_id } = data;
-        
-        // Allows both "key=" and "token=" from the GET URL parameters
-        const safeKey = String(key || token || "").trim();
-        const safeComment = String(comment || "").trim();
-        
-        if (!safeKey) return res.status(200).json({ status: "error", message: "API key is required" });
-
-        // Authenticate the API Key
-        const usersRef = ref(db, "users");
-        const adminSnap = await get(query(usersRef, orderByChild("apiKey"), equalTo(safeKey)));
-        
-        if (!adminSnap.exists()) return res.status(200).json({ status: "error", message: "Invalid API Key" });
-
-        let adminPhone = null, adminData = {};
-        adminSnap.forEach((child) => { 
-            adminPhone = child.key; 
-            adminData = child.val() || {}; 
-        });
-
-        const currentAdminBal = Number(adminData.balance) || 0;
-
-        // ==========================================
-        // API WITHDRAWAL REQUEST (If upi_id is present)
-        // ==========================================
-        if (upi_id) {
-            const withdrawAmount = Number(amount);
-            if (isNaN(withdrawAmount) || withdrawAmount < 10) return res.status(200).json({ status: "error", message: "Minimum withdrawal amount is ₹10." });
-            if (currentAdminBal < withdrawAmount) return res.status(200).json({ status: "error", message: "Insufficient Balance in your API Wallet!" });
-
-            const exactDate = getExactDate();
-            const txnId = "TXN" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
-
-            const updates = {};
-            updates[`users/${adminPhone}/balance`] = increment(-withdrawAmount);
-            
-            updates[`transactions/${txnId}`] = { 
-                id: txnId, type: "out", title: "API UPI Withdrawal", amount: withdrawAmount, 
-                status: "Pending", date: exactDate, timestamp: Date.now(), 
-                icon: "fa-university", color: "blue", name: "Bank Withdraw", 
-                number: upi_id, senderName: adminData.name || adminPhone,
-                senderId: adminPhone, receiverId: "SYSTEM", isApi: true, comment: safeComment
-            };
-
-            await update(ref(db), updates);
-
-            // Send Telegram Alert
-            if (adminData.tgUserId) {
-                let userMsg = `🏦 <b>NG SOLUTION API Withdrawal!</b>\nUPI: <code>${upi_id}</code>\nAmount: ₹${withdrawAmount}\nTxn ID: ${txnId}`;
-                sendTelegramMsg(adminData.tgUserId, userMsg);
-            }
-
-            return res.status(200).json({ 
-                status: "success", 
-                message: `Withdrawal request of ₹${withdrawAmount} submitted successfully for UPI: ${upi_id}`,
-                data: { transaction_id: txnId, amount: withdrawAmount, upi_id: upi_id, comment: safeComment, sender: adminPhone }
-            });
-        }
-        
-        // ==========================================
-        // API PAYMENT TRANSFER (If paytm or number is present)
-        // ==========================================
-        let targetNumber = String(paytm || number || "").trim(); 
-        
-        if (!targetNumber || !amount) {
-            return res.status(200).json({ status: "error", message: "Target number (paytm parameter) and amount are required." });
-        }
-
-        const withdrawAmount = Number(amount);
-        if (isNaN(withdrawAmount) || withdrawAmount <= 0) return res.status(200).json({ status: "error", message: "Invalid amount provided." });
-
-        // Resolve Custom ID if a username was passed instead of phone number
-        const customSnap = await get(ref(db, `custom_ids/${targetNumber.toLowerCase()}`));
-        if (customSnap.exists()) targetNumber = customSnap.val();
-
-        if (String(adminPhone) === targetNumber) return res.status(200).json({ status: "error", message: "Cannot send payment to your own API number!" });
-        if (currentAdminBal < withdrawAmount) return res.status(200).json({ status: "error", message: "Insufficient Balance in your API Wallet!" });
-
-        // Verify the receiver exists
-        const receiverSnap = await get(ref(db, "users/" + targetNumber));
-        if (!receiverSnap.exists()) return res.status(200).json({ status: "error", message: "Receiver account not found in NG SOLUTION." });
-        
-        let receiverData = receiverSnap.val() || {};
-
-        const exactDate = getExactDate();
-        const txnId = "TXN" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
-
-        const updates = {};
-        // Deduct from Sender, Add to Receiver
-        updates[`users/${adminPhone}/balance`] = increment(-withdrawAmount);
-        updates[`users/${targetNumber}/balance`] = increment(withdrawAmount);
-
-        updates[`transactions/${txnId}`] = { 
-            id: txnId, type: "out", title: "API Payment", amount: withdrawAmount, 
-            status: "Success", date: exactDate, timestamp: Date.now(), 
-            icon: "fa-code", color: "blue", name: receiverData.name || targetNumber, 
-            number: targetNumber, senderName: adminData.name || adminPhone,
-            senderId: adminPhone, receiverId: targetNumber, isApi: true, comment: safeComment
-        };
-
-        await update(ref(db), updates);
-
-        let rName = receiverData.name || targetNumber;
-        let aName = adminData.name || adminPhone;
-
-        // Send Telegram Alerts
-        if (adminData.tgUserId) {
-            let msg = `🤖 <b>NG SOLUTION API Payment Sent!</b>\nTo: ${rName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${txnId}`;
-            sendTelegramMsg(adminData.tgUserId, msg);
-        }
-        if (receiverData.tgUserId) {
-            let msg = `💰 <b>NG SOLUTION API Payment Received!</b>\nFrom: ${aName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${txnId}`;
-            sendTelegramMsg(receiverData.tgUserId, msg);
-        }
-
-        return res.status(200).json({ 
-            status: "success", 
-            message: `Payment successful to ${targetNumber}`,
-            data: { 
-                transaction_id: txnId, 
-                amount: withdrawAmount, 
-                receiver: targetNumber,
-                comment: safeComment,
-                sender: adminPhone,
-                sender_name: aName
-            }
-        });
-
-    } catch (error) { 
-        return res.status(500).json({ status: "error", message: "An internal server error occurred." }); 
+// 1. User Signup
+router.post('/signup', async (req, res) => {
+  try {
+    const { phone, password, name } = req.body;
+    if (!phone || !password || !name) {
+      return res.status(400).json({ status: 'error', message: 'Missing fields' });
     }
-}
+    if (!validatePhone(phone)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid phone number' });
+    }
+
+    const userRef = ref(db, `users/${phone}`);
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      return res.status(400).json({ status: 'error', message: 'User already exists' });
+    }
+
+    await set(userRef, {
+      phone,
+      password, // plain text – consider hashing with bcrypt in production
+      name,
+      balance: 0,
+      created_at: new Date().toISOString()
+    });
+
+    res.json({ status: 'success', message: 'User created' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 2. User Login
+router.post('/login', async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+    if (!phone || !password) {
+      return res.status(400).json({ status: 'error', message: 'Phone and password required' });
+    }
+
+    const userRef = ref(db, `users/${phone}`);
+    const snapshot = await get(userRef);
+    if (!snapshot.exists()) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+
+    const user = snapshot.val();
+    if (user.password !== password) {
+      return res.status(401).json({ status: 'error', message: 'Incorrect password' });
+    }
+
+    res.json({
+      status: 'success',
+      user: {
+        phone: user.phone,
+        name: user.name,
+        balance: user.balance || 0
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 3. Get Balance
+router.get('/balance/:phone', async (req, res) => {
+  try {
+    const { phone } = req.params;
+    if (!validatePhone(phone)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid phone' });
+    }
+
+    const snapshot = await get(ref(db, `users/${phone}`));
+    if (!snapshot.exists()) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+
+    const user = snapshot.val();
+    res.json({ status: 'success', balance: user.balance || 0 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 4. Add Money (Deposit)
+router.post('/addMoney', async (req, res) => {
+  try {
+    const { phone, amount, description } = req.body;
+    if (!phone || !amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ status: 'error', message: 'Invalid input' });
+    }
+
+    const userRef = ref(db, `users/${phone}`);
+    const result = await runTransaction(userRef, (currentData) => {
+      if (currentData === null) {
+        return { status: 'error', message: 'User not found' };
+      }
+      currentData.balance = (currentData.balance || 0) + Number(amount);
+      return currentData;
+    });
+
+    if (result.status === 'error' || !result.committed) {
+      return res.status(400).json({ status: 'error', message: result.error || 'Transaction failed' });
+    }
+
+    // Log transaction
+    const txRef = ref(db, `transactions/${phone}`);
+    await push(txRef, {
+      type: 'credit',
+      amount: Number(amount),
+      description: description || 'Added money',
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({ status: 'success', message: 'Money added successfully', newBalance: result.snapshot.val().balance });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 5. Transfer Money
+router.post('/transfer', async (req, res) => {
+  try {
+    const { fromPhone, toPhone, amount, password } = req.body;
+    if (!fromPhone || !toPhone || !amount || isNaN(amount) || amount <= 0 || !password) {
+      return res.status(400).json({ status: 'error', message: 'Invalid input' });
+    }
+    if (fromPhone === toPhone) {
+      return res.status(400).json({ status: 'error', message: 'Cannot transfer to yourself' });
+    }
+
+    // Validate sender
+    const senderRef = ref(db, `users/${fromPhone}`);
+    const senderSnap = await get(senderRef);
+    if (!senderSnap.exists()) {
+      return res.status(404).json({ status: 'error', message: 'Sender not found' });
+    }
+    const sender = senderSnap.val();
+    if (sender.password !== password) {
+      return res.status(401).json({ status: 'error', message: 'Incorrect password' });
+    }
+
+    // Validate recipient
+    const receiverRef = ref(db, `users/${toPhone}`);
+    const receiverSnap = await get(receiverRef);
+    if (!receiverSnap.exists()) {
+      return res.status(404).json({ status: 'error', message: 'Recipient not found' });
+    }
+
+    // Perform transfer with transaction on sender and receiver
+    const result = await runTransaction(senderRef, (currentData) => {
+      if (currentData === null) {
+        return { status: 'error', message: 'Sender data not found' };
+      }
+      const currentBalance = Number(currentData.balance) || 0;
+      if (currentBalance < Number(amount)) {
+        return { status: 'error', message: 'Insufficient balance' };
+      }
+      currentData.balance = currentBalance - Number(amount);
+      return currentData;
+    });
+
+    if (result.status === 'error' || !result.committed) {
+      return res.status(400).json({ status: 'error', message: result.error || 'Transfer failed' });
+    }
+
+    // Add to receiver
+    await runTransaction(receiverRef, (currentData) => {
+      if (currentData === null) {
+        return { status: 'error', message: 'Receiver data not found' };
+      }
+      currentData.balance = (currentData.balance || 0) + Number(amount);
+      return currentData;
+    });
+
+    // Log transactions
+    const txSenderRef = ref(db, `transactions/${fromPhone}`);
+    await push(txSenderRef, {
+      type: 'debit',
+      amount: Number(amount),
+      description: `Transfer to ${toPhone}`,
+      timestamp: new Date().toISOString()
+    });
+    const txReceiverRef = ref(db, `transactions/${toPhone}`);
+    await push(txReceiverRef, {
+      type: 'credit',
+      amount: Number(amount),
+      description: `Transfer from ${fromPhone}`,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({ status: 'success', message: 'Transfer successful' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 6. Get Transaction History
+router.get('/transactions/:phone', async (req, res) => {
+  try {
+    const { phone } = req.params;
+    if (!validatePhone(phone)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid phone' });
+    }
+
+    const snapshot = await get(ref(db, `transactions/${phone}`));
+    if (!snapshot.exists()) {
+      return res.json({ status: 'success', transactions: [] });
+    }
+
+    const transactions = snapshot.val();
+    const txList = Object.keys(transactions).map(key => ({
+      id: key,
+      ...transactions[key]
+    }));
+
+    res.json({ status: 'success', transactions: txList.reverse() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 7. Withdraw Money
+router.post('/withdraw', async (req, res) => {
+  try {
+    const { phone, amount, password } = req.body;
+    if (!phone || !amount || isNaN(amount) || amount <= 0 || !password) {
+      return res.status(400).json({ status: 'error', message: 'Invalid input' });
+    }
+
+    const userRef = ref(db, `users/${phone}`);
+    const snapshot = await get(userRef);
+    if (!snapshot.exists()) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+    const user = snapshot.val();
+    if (user.password !== password) {
+      return res.status(401).json({ status: 'error', message: 'Incorrect password' });
+    }
+
+    const result = await runTransaction(userRef, (currentData) => {
+      if (currentData === null) {
+        return { status: 'error', message: 'User data not found' };
+      }
+      const currentBalance = Number(currentData.balance) || 0;
+      if (currentBalance < Number(amount)) {
+        return { status: 'error', message: 'Insufficient balance' };
+      }
+      currentData.balance = currentBalance - Number(amount);
+      return currentData;
+    });
+
+    if (result.status === 'error' || !result.committed) {
+      return res.status(400).json({ status: 'error', message: result.error || 'Withdrawal failed' });
+    }
+
+    // Log transaction
+    const txRef = ref(db, `transactions/${phone}`);
+    await push(txRef, {
+      type: 'debit',
+      amount: Number(amount),
+      description: 'Withdrawal',
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({ status: 'success', message: 'Withdrawal successful', newBalance: result.snapshot.val().balance });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// ==========================================
+// NEW: PAYMENT RECEIPT FEATURE
+// ==========================================
+
+// 8. Create Payment Link
+router.get('/api/deposit/create', async (req, res) => {
+  try {
+    const { Key, amount, order_id, callback_url } = req.query;
+
+    // Validate merchant API key
+    const merchantSnap = await get(ref(db, `merchants/${Key}`));
+    if (!merchantSnap.exists()) {
+      return res.status(401).json({ status: 'error', message: 'Invalid API key' });
+    }
+
+    const numericAmount = parseFloat(amount);
+    if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({ status: 'error', message: 'Invalid amount' });
+    }
+    if (!order_id || order_id.trim() === '') {
+      return res.status(400).json({ status: 'error', message: 'order_id is required' });
+    }
+
+    const invoice_id = generateInvoiceId();
+    const invoiceData = {
+      invoice_id,
+      order_id,
+      amount: numericAmount,
+      api_key: Key,
+      callback_url: callback_url || null,
+      status: 'pending',
+      payer_phone: null,
+      created_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+    };
+
+    await set(ref(db, `invoices/${invoice_id}`), invoiceData);
+
+    const payment_url = `${req.protocol}://${req.get('host')}/checkout/${invoice_id}`;
+    res.json({ status: 'success', payment_url });
+  } catch (error) {
+    console.error('Create payment error:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 9. Checkout Page (HTML)
+router.get('/checkout/:invoice_id', async (req, res) => {
+  try {
+    const { invoice_id } = req.params;
+    const invoiceSnap = await get(ref(db, `invoices/${invoice_id}`));
+    if (!invoiceSnap.exists()) {
+      return res.status(404).send('Invoice not found');
+    }
+    const invoice = invoiceSnap.val();
+
+    if (invoice.status !== 'pending') {
+      return res.status(400).send('This invoice has already been processed');
+    }
+    if (new Date() > new Date(invoice.expires_at)) {
+      await update(ref(db, `invoices/${invoice_id}`), { status: 'expired' });
+      return res.status(400).send('Invoice has expired');
+    }
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Payment Checkout</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; }
+          .card { border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+          .amount { font-size: 24px; color: #2a7de1; }
+          input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+          button { background: #2a7de1; color: white; padding: 10px; border: none; width: 100%; cursor: pointer; }
+          .error { color: red; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h2>Pay Invoice</h2>
+          <p>Order ID: <strong>${invoice.order_id}</strong></p>
+          <p>Amount: <span class="amount">₹${invoice.amount.toFixed(2)}</span></p>
+          <form action="/api/pay" method="POST">
+            <input type="hidden" name="invoice_id" value="${invoice.invoice_id}" />
+            <label>Enter your wallet password:</label>
+            <input type="password" name="password" required placeholder="Your password" />
+            <button type="submit">Pay Now</button>
+          </form>
+        </div>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('Checkout page error:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+// 10. Process Payment
+router.post('/api/pay', async (req, res) => {
+  try {
+    const { invoice_id, password } = req.body;
+
+    // 1. Get invoice
+    const invoiceSnap = await get(ref(db, `invoices/${invoice_id}`));
+    if (!invoiceSnap.exists()) {
+      return res.status(404).json({ status: 'error', message: 'Invoice not found' });
+    }
+    const invoice = invoiceSnap.val();
+
+    if (invoice.status !== 'pending') {
+      return res.status(400).json({ status: 'error', message: 'Invoice already processed' });
+    }
+    if (new Date() > new Date(invoice.expires_at)) {
+      await update(ref(db, `invoices/${invoice_id}`), { status: 'expired' });
+      return res.status(400).json({ status: 'error', message: 'Invoice expired' });
+    }
+
+    // 2. Identify user (phone number must be provided in the request)
+    const userPhone = req.body.phone;
+    if (!userPhone) {
+      return res.status(401).json({ status: 'error', message: 'User phone number required' });
+    }
+
+    const userSnap = await get(ref(db, `users/${userPhone}`));
+    if (!userSnap.exists()) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+    const user = userSnap.val();
+
+    // 3. Verify password (plain text – consider using bcrypt)
+    if (user.password !== password) {
+      return res.status(401).json({ status: 'error', message: 'Incorrect password' });
+    }
+
+    // 4. Deduct balance (transaction)
+    const userRef = ref(db, `users/${userPhone}`);
+    const result = await runTransaction(userRef, (currentData) => {
+      if (currentData === null) {
+        return { status: 'error', message: 'User data not found' };
+      }
+      const currentBalance = Number(currentData.balance) || 0;
+      if (currentBalance < invoice.amount) {
+        return { status: 'error', message: 'Insufficient balance' };
+      }
+      currentData.balance = currentBalance - invoice.amount;
+      return currentData;
+    });
+
+    if (result.status === 'error' || !result.committed) {
+      return res.status(400).json({ status: 'error', message: result.error || 'Transaction failed' });
+    }
+
+    // 5. Mark invoice as paid
+    await update(ref(db, `invoices/${invoice_id}`), {
+      status: 'paid',
+      payer_phone: userPhone,
+      updated_at: new Date().toISOString()
+    });
+
+    // 6. Callback (if provided)
+    if (invoice.callback_url) {
+      try {
+        await fetch(invoice.callback_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            invoice_id: invoice.invoice_id,
+            order_id: invoice.order_id,
+            amount: invoice.amount,
+            status: 'paid'
+          })
+        });
+      } catch (e) {
+        console.error('Callback failed:', e.message);
+      }
+    }
+
+    // 7. Return success
+    res.json({
+      status: 'success',
+      inv_status: 'paid',
+      amount: invoice.amount,
+      payer_mobile: userPhone
+    });
+  } catch (error) {
+    console.error('Payment processing error:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 11. Invoice Status
+router.get('/api/status/:invoice_id', async (req, res) => {
+  try {
+    const { invoice_id } = req.params;
+    const { Key } = req.query;
+
+    // Validate merchant
+    const merchantSnap = await get(ref(db, `merchants/${Key}`));
+    if (!merchantSnap.exists()) {
+      return res.status(401).json({ status: 'error', message: 'Invalid API key' });
+    }
+
+    const invoiceSnap = await get(ref(db, `invoices/${invoice_id}`));
+    if (!invoiceSnap.exists()) {
+      return res.status(404).json({ status: 'error', message: 'Invoice not found' });
+    }
+    const invoice = invoiceSnap.val();
+
+    res.json({
+      status: 'success',
+      inv_status: invoice.status,
+      amount: invoice.amount,
+      payer_mobile: invoice.payer_phone || null
+    });
+  } catch (error) {
+    console.error('Status check error:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// ==========================================
+// Export the router
+// ==========================================
+export default router;
