@@ -1,9 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, set, update, runTransaction, increment } from "firebase/database";
 
-// 1. Updated Database Configuration
-const firebaseConfig = {
-configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDa3GLjZ_MZ5bSJDGneE2QyLmuhRmQ0SDw",
