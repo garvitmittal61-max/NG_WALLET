@@ -300,7 +300,7 @@
                 </div>
             </div>
 
-            <!-- Reset PIN -->
+            <!-- Reset PIN (forgot password) -->
             <div id="auth-reset-pin" class="theme-card p-6 rounded-3xl shadow-sm border border-gray-100 hidden">
                 <h2 class="text-lg font-black mb-6 text-center text-gray-800">Reset Security</h2>
                 <div id="form-reset-1">
@@ -352,10 +352,10 @@
                     <li><a href="#" onclick="showView('game'); closeSidebarMobile()"><i class="fas fa-history"></i> Transactions</a></li>
                 </ul>
                 
-                <!-- ===== CHANGE PIN OPTION ===== -->
+                <!-- ===== CHANGE PIN OPTION (DIRECT) ===== -->
                 <div class="mt-2 pt-2 border-t border-gray-200">
                     <ul>
-                        <li><a href="#" onclick="showAuthView('reset-pin'); document.getElementById('auth-wrapper').classList.remove('hidden'); closeSidebarMobile()"><i class="fas fa-key"></i> Change Security PIN</a></li>
+                        <li><a href="#" onclick="openChangePinModal(); closeSidebarMobile()"><i class="fas fa-key"></i> Change Security PIN</a></li>
                     </ul>
                 </div>
                 
@@ -1019,6 +1019,24 @@
         <button onclick="closeSuccessOverlay()" class="w-full max-w-sm mx-auto bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide relative z-10">DONE</button>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- ===== CHANGE PIN MODAL (DIRECT 4‑DIGIT PIN CHANGE) ===== -->
+    <!-- ============================================================== -->
+    <div id="changePinModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 transform transition-transform duration-300 scale-95 shadow-2xl border border-gray-100 text-center relative">
+            <button onclick="closeChangePinModal()" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border-4 border-white shadow-sm"><i class="fas fa-key"></i></div>
+            <h3 class="text-xl font-black text-gray-800 mb-1">Change Security PIN</h3>
+            <p class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">Enter your current PIN to set a new one</p>
+
+            <input type="password" id="old-pin" placeholder="Current PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-4 focus-accent text-gray-800 font-mono shadow-sm">
+            <input type="password" id="new-pin" placeholder="New 4-Digit PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-4 focus-accent text-gray-800 font-mono shadow-sm">
+            <input type="password" id="confirm-pin" placeholder="Confirm New PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono shadow-sm">
+
+            <button onclick="processChangePin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">UPDATE PIN</button>
+        </div>
+    </div>
+
     <!-- ===== SCRIPTS ===== -->
     <script src="script.js"></script>
 
@@ -1075,6 +1093,52 @@
                 closeSidebarMobile();
             };
         }
+
+        // ==============================================================
+        // CHANGE PIN MODAL FUNCTIONS
+        // ==============================================================
+        function openChangePinModal() {
+            document.getElementById('changePinModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('changePinModal').classList.remove('opacity-0'), 10);
+            // Clear fields
+            document.getElementById('old-pin').value = '';
+            document.getElementById('new-pin').value = '';
+            document.getElementById('confirm-pin').value = '';
+        }
+
+        function closeChangePinModal() {
+            document.getElementById('changePinModal').classList.add('opacity-0');
+            setTimeout(() => document.getElementById('changePinModal').classList.add('hidden'), 300);
+        }
+
+        async function processChangePin() {
+            let oldPin = document.getElementById('old-pin').value.trim();
+            let newPin = document.getElementById('new-pin').value.trim();
+            let confirmPin = document.getElementById('confirm-pin').value.trim();
+
+            if (!oldPin || !newPin || !confirmPin) return showToast("All fields are required!");
+            if (oldPin.length !== 4 || newPin.length !== 4 || confirmPin.length !== 4) return showToast("PIN must be exactly 4 digits!");
+            if (oldPin !== currentUser?.pin) return showToast("Current PIN is incorrect!");
+            if (newPin !== confirmPin) return showToast("New PIN and Confirm PIN do not match!");
+            if (newPin === oldPin) return showToast("New PIN must be different from current PIN!");
+
+            try {
+                // Use UPDATE_CREDS action – send current password (preserve it) and new pin
+                let currentPassword = currentUser.password;
+                await apiCall('UPDATE_CREDS', {
+                    phone: currentUser.phone,
+                    password: currentPassword,
+                    pin: newPin
+                });
+                // Update local user object
+                currentUser.pin = newPin;
+                updateProfileDashboardUI();
+                showToast("PIN updated successfully!");
+                closeChangePinModal();
+            } catch (e) {
+                showToast(e.message || "Failed to update PIN.");
+            }
+        }
     </script>
 </body>
-                                               </html>
+                                    </html>
