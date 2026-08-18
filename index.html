@@ -17,13 +17,13 @@
     </script>
 
     <style>
-        /* ===== NEW LAYOUT (white sidebar) ===== */
+        /* ===== LAYOUT ===== */
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, sans-serif; }
         body { background:#f1f5f9; overflow:hidden; height:100vh; }
 
         .app-wrapper { display:flex; height:100vh; overflow:hidden; }
 
-        /* White sidebar */
+        /* Sidebar (white) */
         .sidebar-white {
             background:#ffffff;
             color:#1e293b;
@@ -63,14 +63,11 @@
         header .avatar { width:2.5rem; height:2.5rem; border-radius:9999px; background:#dbeafe; display:flex; align-items:center; justify-content:center; font-weight:700; color:#2563eb; border:2px solid white; box-shadow:0 1px 3px rgba(0,0,0,0.05); overflow:hidden; }
         header .avatar img { width:100%; height:100%; object-fit:cover; display:none; }
 
-        /* Scrollable content */
         .scroll-content { flex:1; overflow-y:auto; padding:1.5rem; padding-bottom:7rem; }
 
-        /* View sections */
         .view-section { display:none; }
         .view-section.active { display:block; }
 
-        /* Mobile sidebar */
         @media (max-width:768px) {
             .sidebar-white {
                 position:fixed; top:0; left:0; height:100%; z-index:60;
@@ -86,7 +83,7 @@
             .scroll-content { padding:1rem; padding-bottom:6rem; }
         }
 
-        /* ===== DASHBOARD SPECIFIC STYLES ===== */
+        /* ===== DASHBOARD ===== */
         .balance-card {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
@@ -96,81 +93,41 @@
             overflow: hidden;
             box-shadow: 0 8px 25px rgba(59,130,246,0.3);
         }
-        .balance-card .balance-amount {
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            margin: 0.25rem 0 1rem;
-        }
+        .balance-card .balance-amount { font-size:2.5rem; font-weight:900; letter-spacing:-0.5px; margin:0.25rem 0 1rem; }
         .balance-card .user-detail {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            opacity: 0.9;
-            border-top: 1px solid rgba(255,255,255,0.15);
-            padding-top: 0.75rem;
-            margin-top: 0.5rem;
+            display:flex; justify-content:space-between; font-size:0.8rem; opacity:0.9;
+            border-top:1px solid rgba(255,255,255,0.15); padding-top:0.75rem; margin-top:0.5rem;
         }
-        .balance-card .user-detail span i { margin-right: 0.3rem; width: 1.2rem; }
+        .balance-card .user-detail span i { margin-right:0.3rem; width:1.2rem; }
+        .balance-card .member-since { font-size:0.75rem; opacity:0.8; margin-top:0.25rem; }
+        .balance-card .member-since i { margin-right:0.3rem; }
 
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin: 1.5rem 0;
+            display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin:1.5rem 0;
         }
         .stat-item {
-            background: white;
-            border-radius: 1rem;
-            padding: 0.75rem 0.5rem;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            background:white; border-radius:1rem; padding:0.75rem 0.5rem; text-align:center;
+            border:1px solid #e2e8f0; box-shadow:0 1px 2px rgba(0,0,0,0.04);
         }
-        .stat-item .stat-number {
-            font-weight: 900;
-            font-size: 1.2rem;
-            color: #0f172a;
-        }
-        .stat-item .stat-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #94a3b8;
-            margin-top: 0.1rem;
-        }
+        .stat-item .stat-number { font-weight:900; font-size:1.2rem; color:#0f172a; }
+        .stat-item .stat-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-top:0.1rem; }
 
         .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin: 1.5rem 0;
+            display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin:1.5rem 0;
         }
         .quick-action-btn {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 1rem;
-            padding: 0.75rem 0.25rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            background:white; border:1px solid #e2e8f0; border-radius:1rem; padding:0.75rem 0.25rem;
+            text-align:center; transition:all 0.2s; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.04);
         }
         .quick-action-btn:hover { background:#f8fafc; border-color:#93c5fd; }
-        .quick-action-btn i { font-size: 1.5rem; color: #3b82f6; display:block; margin-bottom:0.25rem; }
+        .quick-action-btn i { font-size:1.5rem; color:#3b82f6; display:block; margin-bottom:0.25rem; }
         .quick-action-btn span { font-size:0.7rem; font-weight:700; color:#334155; display:block; }
         .quick-action-btn small { font-size:0.6rem; color:#94a3b8; display:block; margin-top:0.15rem; }
 
+        /* Transaction items */
         .txn-item {
-            background: white;
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background:white; border-radius:1rem; padding:0.75rem 1rem; border:1px solid #e2e8f0;
+            margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;
         }
         .txn-item .txn-left { display:flex; align-items:center; gap:0.75rem; flex:1; }
         .txn-item .txn-icon { width:2.5rem; height:2.5rem; border-radius:9999px; background:#eef2ff; display:flex; align-items:center; justify-content:center; color:#3b82f6; }
@@ -185,19 +142,47 @@
         .txn-status.pending { background:#fef9c3; color:#ca8a04; }
         .txn-status.failed { background:#fee2e2; color:#dc2626; }
 
-        .member-since {
-            font-size:0.75rem;
-            opacity:0.8;
-            margin-top:0.25rem;
-        }
-        .member-since i { margin-right:0.3rem; }
+        /* Auth forms */
+        .theme-card { background:white; border-radius:1.5rem; }
+        .focus-accent:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.2); }
+        .btn-animate { transition:all 0.15s; }
+        .btn-animate:active { transform:scale(0.97); }
 
-        /* Keep all your existing styles from style.css */
+        /* Toggle switch */
+        .toggle-switch { position:relative; display:inline-block; width:48px; height:28px; flex-shrink:0; }
+        .toggle-switch input { opacity:0; width:0; height:0; }
+        .toggle-switch .slider { position:absolute; cursor:pointer; inset:0; background:#cbd5e1; transition:0.3s; border-radius:9999px; }
+        .toggle-switch .slider:before { content:""; position:absolute; height:20px; width:20px; left:4px; bottom:4px; background:white; transition:0.3s; border-radius:50%; }
+        .toggle-switch input:checked + .slider { background:#3b82f6; }
+        .toggle-switch input:checked + .slider:before { transform:translateX(20px); }
+
+        /* API cards */
+        .api-card { background:white; border-radius:1.5rem; border:1px solid #e2e8f0; overflow:hidden; margin-bottom:1.5rem; }
+        .api-header { padding:1rem 1.5rem; background:#f8fafc; border-bottom:1px solid #e2e8f0; font-weight:700; display:flex; align-items:center; gap:0.75rem; }
+        .api-content { padding:1.5rem; }
+        .api-code-block { background:#0f172a; color:#e2e8f0; padding:0.75rem 1rem; border-radius:0.75rem; font-size:0.7rem; font-family:monospace; word-break:break-all; position:relative; }
+
+        .no-scrollbar::-webkit-scrollbar { display:none; }
+        .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+
+        /* Public Lifafa background */
+        .lifafa-float { animation:lifafaFloat 3s ease-in-out infinite; }
+        @keyframes lifafaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+        /* Rocket animation */
+        .straight-rocket-wrapper { position:relative; width:100%; height:200px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+        .straight-rocket { font-size:5rem; animation:rocketLaunch 1.5s ease-out forwards; }
+        .rocket-fire { width:30px; height:40px; background:linear-gradient(to top, #f97316, #ef4444, transparent); border-radius:0 0 50% 50%; margin-top:-10px; animation:fireFlicker 0.2s infinite alternate; }
+        @keyframes rocketLaunch { 0%{transform:translateY(100px) scale(0.5); opacity:0;} 100%{transform:translateY(0) scale(1); opacity:1;} }
+        @keyframes fireFlicker { 0%{transform:scaleX(0.8) scaleY(1); opacity:0.8;} 100%{transform:scaleX(1.2) scaleY(0.8); opacity:1;} }
+        .rocket-ground { width:100%; height:4px; background:linear-gradient(to right, transparent, #94a3b8, transparent); margin-top:10px; border-radius:9999px; }
+        .skeleton-shimmer { animation:shimmer 1.5s infinite; background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%); background-size:200% 100%; }
+        @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
     </style>
 </head>
 <body>
 
-    <!-- ===== SPLASH SCREEN ===== -->
+    <!-- ===== SPLASH ===== -->
     <div id="splash-screen" class="fixed inset-0 bg-blue-500 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="w-24 h-24 bg-white rounded-3xl shadow-2xl flex items-center justify-center text-blue-500 text-5xl mb-6 animate-bounce">
             <i class="fas fa-wallet"></i>
@@ -221,15 +206,74 @@
         <button onclick="logoutUser()" class="px-8 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold tracking-wide">Logout</button>
     </div>
 
-    <!-- ===== AUTH WRAPPER (unchanged) ===== -->
+    <!-- ===== AUTH WRAPPER ===== -->
     <div id="auth-wrapper" class="fixed inset-0 bg-white z-40 hidden flex items-center justify-center p-6 pb-20 overflow-y-auto no-scrollbar">
         <div class="w-full max-w-sm mt-10">
-            <!-- (your existing auth forms – unchanged) -->
-            <!-- I'll keep them concise, but they are exactly as you had. -->
-            <!-- For brevity, I'll include a placeholder but you must paste your auth HTML here. -->
-            <!-- In the final code, I'll include the full auth block from your original. -->
-            <!-- Since this is a full replacement, I'll paste your original auth block from the previous answer. -->
-            <!-- Actually, I'll copy the auth block from the previous answer to keep it complete. -->
+            <div class="text-center mb-10">
+                <div class="w-20 h-20 bg-blue-600 rounded-3xl shadow-xl flex items-center justify-center text-white text-4xl mx-auto mb-6">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h1 class="text-3xl font-black text-gray-800 tracking-tight mb-2">NG SOLUTION</h1>
+                <p class="text-gray-400 font-bold text-sm tracking-widest uppercase">Sign In to Continue</p>
+            </div>
+
+            <!-- Login -->
+            <div id="auth-login" class="theme-card p-6 rounded-3xl shadow-sm border border-gray-100">
+                <input type="number" id="login-phone" placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-6 focus-accent font-mono">
+                <button onclick="processLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">LOGIN</button>
+                <div class="flex justify-between items-center mt-6">
+                    <button onclick="showAuthView('signup')" class="text-xs font-bold text-blue-500 hover:text-blue-600 tracking-wide">Create Account</button>
+                    <button onclick="showAuthView('reset-pin')" class="text-xs font-bold text-gray-400 hover:text-gray-600">Forgot Password?</button>
+                </div>
+            </div>
+
+            <!-- Signup -->
+            <div id="auth-signup" class="theme-card p-6 rounded-3xl shadow-sm border border-gray-100 hidden">
+                <h2 class="text-lg font-black mb-6 text-center text-gray-800">New Account</h2>
+                <input type="text" id="reg-name" placeholder="Full Name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent">
+                <input type="number" id="reg-phone" placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <input type="email" id="reg-email" placeholder="Email Address (Required)" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <input type="password" id="reg-pass" placeholder="Create Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <input type="password" id="reg-pin" placeholder="Create 4-Digit Security PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <div class="flex items-center gap-2 mb-2">
+                    <input type="number" id="reg-telegram" placeholder="Telegram User ID" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus-accent font-mono">
+                    <a href="https://t.me/NG_WALLET_BOT" target="_blank" class="bg-blue-100 text-blue-600 px-4 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap border border-blue-200 hover:bg-blue-200 transition-colors">Get UserID</a>
+                </div>
+                <a href="https://t.me/NG_WALLET_BOT" target="_blank" class="block text-[10px] text-blue-500 hover:text-blue-600 text-center mb-6 font-bold uppercase tracking-wider"><i class="fab fa-telegram"></i> Click to Start @NG_WALLET_BOT</a>
+                <button id="btn-signup-otp" onclick="processSignupStep1()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">SEND OTP TO TELEGRAM</button>
+                <div class="text-center mt-6">
+                    <button onclick="showAuthView('login')" class="text-xs font-bold text-gray-400 hover:text-blue-500 tracking-wide">Back to Login</button>
+                </div>
+            </div>
+
+            <!-- Reset PIN -->
+            <div id="auth-reset-pin" class="theme-card p-6 rounded-3xl shadow-sm border border-gray-100 hidden">
+                <h2 class="text-lg font-black mb-6 text-center text-gray-800">Reset Security</h2>
+                <div id="form-reset-1">
+                    <input type="number" id="reset-phone" placeholder="Registered Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-6 focus-accent font-mono">
+                    <button onclick="processResetPinStep1()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">SEND OTP</button>
+                </div>
+                <div id="form-reset-2" class="hidden">
+                    <input type="password" id="reset-new-pass" placeholder="New Password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                    <input type="password" id="reset-new-pin" placeholder="New 4-Digit PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-6 focus-accent font-mono">
+                    <button onclick="processResetPinStep2()" class="w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg shadow-green-500/30 btn-animate tracking-wide">SAVE CHANGES</button>
+                </div>
+                <div class="text-center mt-6">
+                    <button onclick="showAuthView('login')" class="text-xs font-bold text-gray-400 hover:text-blue-500 tracking-wide">Back to Login</button>
+                </div>
+            </div>
+
+            <!-- OTP -->
+            <div id="auth-otp" class="theme-card p-6 rounded-3xl shadow-sm border border-gray-100 hidden">
+                <h2 class="text-lg font-black mb-2 text-center text-gray-800">Enter OTP</h2>
+                <p class="text-xs text-gray-400 text-center mb-6 font-medium">Sent to your linked Telegram account</p>
+                <input type="number" id="otp-input" placeholder="6-Digit OTP" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-2xl tracking-widest font-black mb-6 focus-accent text-blue-600 font-mono">
+                <button onclick="verifyOTP()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">VERIFY & PROCEED</button>
+                <div class="text-center mt-6">
+                    <button onclick="showAuthView('login')" class="text-xs font-bold text-gray-400 hover:text-red-500 tracking-wide">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -302,10 +346,8 @@
             <!-- SCROLLABLE CONTENT -->
             <div class="scroll-content" id="mainScroll">
 
-                <!-- ===== VIEW: HOME (NEW DASHBOARD UI) ===== -->
+                <!-- ===== HOME (DASHBOARD) ===== -->
                 <div id="view-home" class="view-section active">
-
-                    <!-- Greeting -->
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h2 class="text-2xl font-black text-gray-800 tracking-tight">Dashboard</h2>
@@ -381,7 +423,7 @@
                         <button onclick="showView('game')" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">View All</button>
                     </div>
                     <div id="home-txn-list">
-                        <!-- Will be populated by script.js -->
+                        <!-- Populated by script.js -->
                         <div class="txn-item skeleton-shimmer">
                             <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
                             <div class="txn-amount bg-gray-200 rounded w-16 h-6"></div>
@@ -391,16 +433,14 @@
                             <div class="txn-amount bg-gray-200 rounded w-16 h-6"></div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- ===== VIEW: TRANSACTIONS (game) ===== -->
+                <!-- ===== VIEW: TRANSACTIONS ===== -->
                 <div id="view-game" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
                         <h2 class="text-2xl font-black text-gray-800">Transaction History</h2>
                     </div>
-                    <!-- (your existing transaction history content – unchanged) -->
                     <div class="flex justify-between items-end mb-4 mt-6">
                         <h3 class="text-lg font-black text-gray-800">All History</h3>
                         <button onclick="clearStatsFilters()" class="text-[10px] font-bold text-gray-500 hover:text-blue-600 uppercase tracking-widest"><i class="fas fa-sync-alt mr-1"></i> Reset</button>
@@ -428,7 +468,6 @@
 
                 <!-- ===== VIEW: PROFILE ===== -->
                 <div id="view-myprofile" class="view-section">
-                    <!-- (your existing profile content – unchanged) -->
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-3">
                             <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -436,8 +475,6 @@
                         </div>
                         <button onclick="editProfileName()" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm hover:bg-blue-100 transition-colors border border-blue-100"><i class="fas fa-pen text-sm"></i></button>
                     </div>
-                    <!-- ... rest of profile ... -->
-                    <!-- (I'll keep it minimal here, but you have the full version in your original file) -->
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center mb-6 relative">
                         <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full mb-4 border-4 border-white shadow-lg relative overflow-hidden flex items-center justify-center text-4xl font-black text-blue-500">
                             <span id="profile-dashboard-initial" class="absolute inset-0 flex items-center justify-center">U</span>
@@ -494,7 +531,6 @@
 
                 <!-- ===== VIEW: API ===== -->
                 <div id="view-api" class="view-section">
-                    <!-- (your existing API content – unchanged) -->
                     <div class="flex items-center gap-3 mb-8">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
                         <h2 class="text-2xl font-black text-gray-800">API System</h2>
@@ -532,7 +568,6 @@
 
                 <!-- ===== VIEW: LIFAFA ===== -->
                 <div id="view-lifafa" class="view-section">
-                    <!-- (your existing Lifafa content – unchanged) -->
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
                         <h2 class="text-2xl font-black text-gray-800">Advanced Lifafa</h2>
@@ -637,7 +672,7 @@
                     </div>
                 </div>
 
-                <!-- ===== NEW PLACEHOLDER VIEWS (for sidebar) ===== -->
+                <!-- ===== VIEW: BULK PAY (placeholder) ===== -->
                 <div id="view-bulk-pay" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -650,6 +685,7 @@
                     </div>
                 </div>
 
+                <!-- ===== VIEW: UPI API (placeholder) ===== -->
                 <div id="view-upi-api" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -667,30 +703,389 @@
     </div> <!-- end app-wrapper -->
 
     <!-- ============================================================== -->
-    <!-- ===== ALL MODALS (unchanged – copy from your original file) ===== -->
+    <!-- ===== ALL MODALS ===== -->
     <!-- ============================================================== -->
-    <!-- 
-        Paste your existing modals here:
-        - actionModalSend
-        - actionModalWithdraw
-        - actionModalAdd
-        - actionModalReceive
-        - actionModalScan
-        - actionModalBulk
-        - actionModalGift
-        - actionModalKeeper
-        - customIdModal
-        - public-lifafa-wrapper
-        - toast
-        - txnModal
-        - txn-result-overlay
-    -->
+
+    <!-- Send Modal -->
+    <div id="actionModalSend" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-paper-plane text-blue-600"></i> Send Money</h3>
+                <button onclick="document.getElementById('actionModalSend').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalSend').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-send" onsubmit="event.preventDefault(); processSend();">
+                <input type="number" id="send-num" placeholder="Receiver Phone Number" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-3 focus-accent font-mono">
+                <div id="send-name" class="w-full text-center text-sm font-bold text-gray-400 mb-4 h-6"></div>
+                <div class="relative mb-4">
+                    <span class="absolute left-4 top-3 text-gray-400 font-black">₹</span>
+                    <input type="number" id="send-amt" placeholder="0.00" required class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-lg font-black focus-accent font-mono text-blue-600">
+                </div>
+                <input type="text" id="send-comment" placeholder="Add a note (Optional)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent">
+                <input type="password" id="send-pin" placeholder="Enter 4-Digit PIN" maxlength="4" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono shadow-sm">
+                <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">PAY NOW</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="actionModalWithdraw" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-university text-blue-600"></i> Withdraw Money</h3>
+                <button onclick="document.getElementById('actionModalWithdraw').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalWithdraw').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-withdraw" onsubmit="event.preventDefault(); processWithdraw();">
+                <input type="text" id="with-upi" placeholder="Enter Destination UPI ID" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono text-gray-800">
+                <div class="relative mb-4">
+                    <span class="absolute left-4 top-3 text-gray-400 font-black">₹</span>
+                    <input type="number" id="with-amt" placeholder="0.00" min="10" required class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-lg font-black focus-accent font-mono text-blue-600">
+                </div>
+                <p class="text-[10px] text-gray-400 font-bold mb-4 text-center">Minimum withdrawal is ₹10 WITH 10%TAX</p>
+                <input type="password" id="with-pin" placeholder="Enter 4-Digit PIN" maxlength="4" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono shadow-sm">
+                <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">WITHDRAW NOW</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Funds Modal -->
+    <div id="actionModalAdd" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-plus-circle text-blue-600"></i> Add Funds</h3>
+                <button onclick="document.getElementById('actionModalAdd').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalAdd').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-center mb-6">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Scan & Pay to Deposit</p>
+                <img id="deposit-qr-img" src="" class="w-48 h-48 mx-auto rounded-xl shadow-sm border border-gray-200 p-1 bg-white mb-3 object-contain">
+                <p class="text-sm font-bold text-gray-600">UPI ID: <span id="ui-upi-id" class="text-blue-600 font-mono font-black select-all">Loading...</span></p>
+            </div>
+            <form id="form-add" onsubmit="event.preventDefault(); processAdd();">
+                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Deposit Details</label>
+                <div class="relative mb-3">
+                    <span class="absolute left-4 top-3 text-gray-400 font-black">₹</span>
+                    <input type="number" id="add-amt" placeholder="0.00" required class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-lg font-black focus-accent font-mono text-blue-600">
+                </div>
+                <input type="text" id="add-utr" placeholder="12-Digit UTR / Ref Number" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent font-mono">
+                <input type="file" id="deposit-screenshot" accept="image/*" class="hidden" onchange="handleScreenshotUpload(event)">
+                <button type="button" id="btn-upload-screenshot" onclick="document.getElementById('deposit-screenshot').click()" class="w-full mb-4 py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors shadow-sm">
+                    <i class="fas fa-image"></i> Upload Payment Screenshot
+                </button>
+                <div id="screenshot-preview-container" class="hidden mb-4 relative rounded-xl overflow-hidden border border-gray-200 shadow-sm h-32 bg-gray-50">
+                    <img id="screenshot-preview-img" src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
+                        <span class="text-[10px] font-black text-white uppercase tracking-widest"><i class="fas fa-check-circle text-green-400 mr-1"></i> Attached</span>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">SUBMIT REQUEST</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Receive Modal -->
+    <div id="actionModalReceive" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 transform transition-transform duration-300 scale-95 shadow-2xl border border-gray-100 text-center relative">
+            <button onclick="document.getElementById('actionModalReceive').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalReceive').classList.add('hidden'),300);" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            <h3 class="text-xl font-black text-gray-800 mb-1 mt-2">Receive Payment</h3>
+            <p class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">Show this QR to sender</p>
+            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 inline-block mb-6 shadow-inner">
+                <img id="receive-qr-img" src="" class="w-48 h-48 bg-white p-2 rounded-xl border border-gray-100 shadow-sm mx-auto">
+            </div>
+            <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl">
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Your Registered Number</p>
+                <p class="text-lg font-black text-blue-600 font-mono tracking-widest" id="receive-num-display">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Modal -->
+    <div id="actionModalScan" class="fixed inset-0 bg-slate-900/90 z-50 hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-start pt-10">
+        <div class="w-full max-w-md px-6 mb-4 flex justify-between items-center text-white">
+            <h3 class="text-xl font-black tracking-wide">Scan QR Code</h3>
+            <button onclick="stopScanner(); document.getElementById('actionModalScan').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalScan').classList.add('hidden'),300);" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-sm"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="scanner-container" class="w-full max-w-sm px-6 mb-6">
+            <div class="relative w-full aspect-square rounded-3xl overflow-hidden border-4 border-white/20 shadow-2xl bg-black">
+                <div id="reader" class="w-full h-full"></div>
+                <div class="absolute w-full h-[2px] bg-blue-500 z-10 animate-scanline shadow-[0_0_15px_3px_rgba(37,99,235,0.6)]"></div>
+                <div class="absolute inset-0 pointer-events-none border-[3px] border-dashed border-white/30 rounded-3xl m-6"></div>
+            </div>
+            <div class="flex justify-center gap-6 mt-8">
+                <button onclick="document.getElementById('qr-upload').click()" class="w-14 h-14 rounded-full bg-white/10 text-white flex items-center justify-center text-xl hover:bg-white/20 backdrop-blur-md transition-colors"><i class="fas fa-image"></i></button>
+                <input type="file" id="qr-upload" accept="image/*" class="hidden" onchange="handleQRUpload(event)">
+                <button onclick="toggleQRTorch()" id="btn-qr-torch" class="w-14 h-14 rounded-full bg-white/10 text-white flex items-center justify-center text-xl hover:bg-white/20 backdrop-blur-md transition-colors"><i class="fas fa-bolt"></i></button>
+                <button onclick="toggleQRZoom()" class="w-14 h-14 rounded-full bg-white/10 text-white flex items-center justify-center text-sm font-black hover:bg-white/20 backdrop-blur-md transition-colors" id="btn-qr-zoom">1x</button>
+            </div>
+        </div>
+        <div id="scan-result" class="hidden w-full max-w-md bg-white rounded-t-3xl p-6 pb-10 mt-auto transform translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.2)]">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-2xl text-blue-600 mb-3 border-4 border-white shadow-sm"><i class="fas fa-user"></i></div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Paying To</p>
+                <h4 id="scan-res-name" class="text-xl font-black text-gray-800 mb-0.5">Name</h4>
+                <p id="scan-res-phone" class="text-sm font-bold text-gray-500 font-mono">Number</p>
+            </div>
+            <div class="relative mb-4">
+                <span class="absolute left-4 top-3 text-gray-400 font-black">₹</span>
+                <input type="number" id="scan-amt" placeholder="0.00" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-lg font-black focus-accent font-mono text-blue-600">
+            </div>
+            <input type="text" id="scan-comment" placeholder="Add a note (Optional)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent">
+            <input type="password" id="scan-pin" placeholder="Enter 4-Digit PIN" maxlength="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono">
+            <button onclick="processScanPay()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">PAY SECURELY</button>
+            <button onclick="resetScanner()" class="w-full mt-3 py-3 text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors">Cancel & Rescan</button>
+        </div>
+    </div>
+
+    <!-- Bulk Modal -->
+    <div id="actionModalBulk" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-users text-blue-600"></i> Bulk Transfer</h3>
+                <button onclick="document.getElementById('actionModalBulk').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalBulk').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <textarea id="bulk-nums" placeholder="Enter numbers separated by new line&#10;9876543210&#10;9988776655" class="w-full h-32 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-mono mb-4 focus-accent resize-none"></textarea>
+            <div class="relative mb-4">
+                <span class="absolute left-4 top-3 text-gray-400 font-black">₹</span>
+                <input type="number" id="bulk-amt" placeholder="Amount per user" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-lg font-black focus-accent font-mono text-blue-600">
+            </div>
+            <input type="text" id="bulk-comment" placeholder="Add a note (Optional)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4 focus-accent">
+            <input type="password" id="bulk-pin" placeholder="Enter 4-Digit PIN" maxlength="4" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono shadow-sm">
+            <button onclick="processBulk()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">PROCESS BULK SEND</button>
+        </div>
+    </div>
+
+    <!-- Gift Modal -->
+    <div id="actionModalGift" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-gift text-blue-600"></i> Gift Codes</h3>
+                <button onclick="document.getElementById('actionModalGift').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalGift').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
+                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Claim a Code</h4>
+                <div class="flex gap-2">
+                    <input type="text" id="claim-code" placeholder="Enter 5-Digit Code" maxlength="5" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 font-black focus-accent font-mono uppercase tracking-widest text-blue-600 text-center shadow-sm">
+                    <button onclick="processGiftClaim()" class="bg-blue-600 text-white px-5 rounded-xl font-black shadow-md hover:bg-blue-700 transition-colors">CLAIM</button>
+                </div>
+            </div>
+            <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 border-t border-gray-100 pt-4">Create New Gift Code</h4>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="relative"><span class="absolute left-3 top-3 text-gray-400 font-black">₹</span><input type="number" id="gift-amt" placeholder="Amount" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-7 pr-3 py-3 font-black focus-accent font-mono text-blue-600"></div>
+                <input type="number" id="gift-users" placeholder="Max Users" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-bold focus-accent font-mono text-gray-600">
+            </div>
+            <input type="password" id="gift-pin" placeholder="Enter 4-Digit PIN" maxlength="4" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-center text-xl tracking-widest font-black mb-6 focus-accent text-gray-800 font-mono shadow-sm">
+            <button onclick="processGiftCreate()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">GENERATE CODE</button>
+        </div>
+    </div>
+
+    <!-- Vault (Keeper) Modal -->
+    <div id="actionModalKeeper" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-2xl border-t border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-lock text-blue-600"></i> Secure Vault</h3>
+                <button onclick="document.getElementById('actionModalKeeper').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalKeeper').classList.add('hidden'),300);" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1 bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col items-center justify-center">
+                    <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">WALLET</p>
+                    <p class="text-lg font-black text-green-500">₹<span class="global-balance">0.00</span></p>
+                </div>
+                <div class="flex-1 bg-gray-50 rounded-2xl p-4 border border-gray-200 flex flex-col items-center justify-center">
+                    <p class="text-[10px] text-gray-400 font-bold tracking-wider mb-1">VAULT</p>
+                    <p class="text-lg font-black text-orange-500">₹<span class="global-keeper-balance">0.00</span></p>
+                </div>
+            </div>
+            <div class="flex bg-gray-100 rounded-xl p-1 gap-1 mb-4 border border-gray-200">
+                <button onclick="switchKeeperTab('keeper-lock')" id="btn-keeper-lock" class="flex-1 py-3 text-xs font-bold text-gray-500 rounded-lg keeper-tab-btn active"><i class="fas fa-lock mr-1"></i> LOCK</button>
+                <button onclick="switchKeeperTab('keeper-with')" id="btn-keeper-with" class="flex-1 py-3 text-xs font-bold text-gray-500 rounded-lg keeper-tab-btn"><i class="fas fa-unlock mr-1"></i> WITHDRAW</button>
+            </div>
+            <div id="keeper-lock" class="keeper-tab-content active">
+                <form onsubmit="event.preventDefault(); processKeeperLock()">
+                    <div class="relative mb-4"><span class="absolute left-4 top-3 text-gray-400 font-black">₹</span><input type="number" id="kl-amt" required placeholder="Amount to Lock" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 focus-accent font-black text-blue-600"></div>
+                    <input type="password" id="kl-pin" required maxlength="4" placeholder="Enter 4-Digit PIN" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest font-black text-lg mb-6 focus-accent text-gray-800">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">LOCK SECURELY</button>
+                </form>
+            </div>
+            <div id="keeper-with" class="keeper-tab-content">
+                <form onsubmit="event.preventDefault(); processKeeperWithdraw()">
+                    <div class="relative mb-4"><span class="absolute left-4 top-3 text-gray-400 font-black">₹</span><input type="number" id="kw-amt" required placeholder="Amount to Withdraw" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 focus-accent font-black text-orange-500"></div>
+                    <input type="password" id="kw-pin" required maxlength="4" placeholder="Enter 4-Digit PIN" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center tracking-widest font-black text-lg mb-6 focus-accent text-gray-800">
+                    <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg shadow-orange-500/30 btn-animate tracking-wide">WITHDRAW TO WALLET</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom ID Modal -->
+    <div id="customIdModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 transform transition-transform duration-300 scale-95 shadow-2xl border border-gray-100 text-center relative">
+            <button onclick="document.getElementById('customIdModal').classList.add('opacity-0'); setTimeout(()=>document.getElementById('customIdModal').classList.add('hidden'),300);" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border-4 border-white shadow-sm"><i class="fas fa-at"></i></div>
+            <h3 class="text-xl font-black text-gray-800 mb-1">Set Custom ID</h3>
+            <p class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest" id="custom-id-pricing">Cost: ₹5.00</p>
+            <input type="text" id="input-custom-id" placeholder="e.g. ng_gamer" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-mono font-bold text-center focus-accent mb-6 text-gray-800 lowercase">
+            <button onclick="saveCustomId()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">PURCHASE ID</button>
+        </div>
+    </div>
+
+    <!-- Public Lifafa -->
+    <div id="public-lifafa-wrapper" class="fixed inset-0 bg-white z-[100] hidden flex-col items-center justify-center p-6 pb-20 overflow-y-auto bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        <div class="w-full max-w-sm relative">
+            <button onclick="resetPublicLifafa(); window.history.replaceState({}, document.title, '/');" class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center shadow-sm z-10"><i class="fas fa-times"></i></button>
+            <div class="text-center mb-8 lifafa-float">
+                <div class="w-24 h-24 bg-blue-600 rounded-3xl shadow-xl shadow-blue-500/30 flex items-center justify-center text-white text-5xl mx-auto relative border border-blue-500">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+            </div>
+            <div id="lif-public-step-1" class="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center relative overflow-hidden">
+                <h2 class="text-2xl font-black text-gray-800 mb-2">Claim Lifafa</h2>
+                <p class="text-xs font-bold text-gray-400 mb-8 uppercase tracking-widest">Enter your registered number</p>
+                <input type="number" id="public-lif-phone" placeholder="Phone Number" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center font-mono font-black text-lg focus-accent mb-6 shadow-sm">
+                <button onclick="verifyLifafaUser()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide">NEXT <i class="fas fa-arrow-right ml-1"></i></button>
+            </div>
+            <div id="lif-public-step-2" class="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center hidden">
+                <h2 class="text-2xl font-black text-gray-800 mb-2">Action Required</h2>
+                <p class="text-[10px] font-bold text-red-500 mb-6 uppercase tracking-widest bg-red-50 py-2 rounded-lg border border-red-100">Join all channels to unlock</p>
+                <div id="public-channels-grid" class="grid grid-cols-2 gap-3 mb-6 max-h-48 overflow-y-auto no-scrollbar pr-1"></div>
+                <button id="btn-lif-verify-channels" onclick="verifyLifafaChannelsJoined()" class="w-full bg-gray-800 text-white font-black py-4 rounded-xl shadow-lg btn-animate tracking-wide flex items-center justify-center gap-2"><i class="fas fa-sync-alt"></i> CHECK MEMBERSHIP</button>
+            </div>
+            <div id="lif-public-step-3" class="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center hidden">
+                <h2 class="text-2xl font-black text-gray-800 mb-6">Unlock Lifafa</h2>
+                <div id="public-lif-password-box" class="mb-6">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Access Code Required</p>
+                    <input type="text" id="public-lif-password" placeholder="Enter secret code" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-4 text-center font-mono font-black focus-accent shadow-sm">
+                </div>
+                <button onclick="executePublicLifafaClaim()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide text-lg">OPEN LIFAFA</button>
+            </div>
+            <div id="lif-public-result" class="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center hidden"></div>
+            <div id="lif-public-refer-step" class="bg-white rounded-3xl p-6 shadow-2xl border border-gray-100 text-center hidden">
+                <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fas fa-share-alt"></i></div>
+                <h2 class="text-xl font-black text-gray-800 mb-2">Already Claimed!</h2>
+                <p class="text-xs font-bold text-gray-400 mb-6 px-2">You can still earn money by referring this Lifafa to others.</p>
+                <div class="relative mb-6">
+                    <input type="text" id="public-lif-refer-link" readonly class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-4 text-xs font-mono font-bold text-gray-600 focus-accent shadow-sm">
+                    <button onclick="copyText(document.getElementById('public-lif-refer-link').value)" class="absolute right-2 top-2 bottom-2 w-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"><i class="fas fa-copy"></i></button>
+                </div>
+                <button onclick="window.location.href='/'" class="text-sm font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest">Go to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 border border-gray-700">
+        <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs"><i class="fas fa-info"></i></div>
+        <span id="toastMsg" class="font-bold text-sm tracking-wide">Message</span>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="txnModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center pb-0 sm:pb-6">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto no-scrollbar border border-gray-100">
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl border border-gray-200 text-gray-800"><i id="txnModalIcon" class="fas fa-file-invoice-dollar text-blue-600"></i></div>
+                    <div>
+                        <h3 id="txnModalTitle" class="text-xl font-black text-gray-800">Details</h3>
+                        <p id="txnModalDate" class="text-xs font-bold text-gray-400 mt-0.5">Date</p>
+                    </div>
+                </div>
+                <button onclick="closeTxnModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="text-center py-6 border-y border-gray-50 bg-gray-50 rounded-2xl mb-6 shadow-inner">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Transaction Amount</p>
+                <h2 id="txnModalAmount" class="text-4xl font-black text-gray-800 tracking-tight">₹0.00</h2>
+                <div id="txnModalStatus" class="text-xs font-black uppercase tracking-wider mt-3 rounded-full px-4 py-1.5 inline-block bg-gray-100 text-gray-600 border border-gray-200">Status</div>
+            </div>
+            <div class="space-y-4 mb-8 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Type</span>
+                    <span id="txnModalType" class="text-sm font-black text-gray-800">Type</span>
+                </div>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">To/From</span>
+                    <span id="txnModalName" class="text-sm font-black text-gray-800 text-right">Name</span>
+                </div>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Account</span>
+                    <span id="txnModalNumber" class="text-sm font-bold text-gray-600 font-mono">Number</span>
+                </div>
+                <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Note</span>
+                    <span id="txnModalComment" class="text-sm font-medium text-gray-600 italic">None</span>
+                </div>
+                <div class="flex justify-between items-center pt-1">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">TXN ID</span>
+                    <div class="flex items-center gap-2">
+                        <span id="txnModalId" class="text-[10px] font-mono font-bold text-blue-500 bg-blue-50 border border-blue-100 px-2 py-1 rounded">ID</span>
+                        <button onclick="copyTxnId()" class="text-gray-400 hover:text-blue-500"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="txnModalScreenshotContainer" class="hidden mb-6">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Attached Receipt</p>
+                <img id="txnModalScreenshotImg" src="" class="w-full rounded-2xl border border-gray-200 shadow-sm">
+            </div>
+            <button onclick="toggleTxnVisibility()" class="w-full py-4 rounded-xl text-xs font-black text-red-400 hover:text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 transition-colors uppercase tracking-widest"><i class="fas fa-eye-slash mr-2"></i> Hide from Home</button>
+        </div>
+    </div>
+
+    <!-- Transaction Result Overlay -->
+    <div id="txn-result-overlay" class="fixed inset-0 bg-white z-[100] hidden flex-col items-center justify-between py-10 px-6">
+        <div id="rocket-overlay" class="absolute inset-0 bg-white z-0 hidden flex-col items-center justify-end overflow-hidden">
+            <div id="rocket-wrapper" class="straight-rocket-wrapper">
+                <div class="straight-rocket">🚀</div>
+                <div class="rocket-fire"></div>
+            </div>
+            <div class="rocket-ground"></div>
+        </div>
+        <div class="w-full flex-1 flex flex-col items-center justify-center relative z-10 mt-10">
+            <div id="txn-result-icon-bg" class="w-24 h-24 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner border border-gray-100 bg-gray-50">
+                <i id="txn-result-icon" class="fas fa-circle-notch fa-spin text-gray-400"></i>
+            </div>
+            <h2 id="txn-result-title" class="text-2xl font-black text-gray-800 mb-2 tracking-tight text-center">Processing...</h2>
+            <div class="text-5xl font-black text-gray-800 mb-10 tracking-tighter flex items-center">
+                <span class="text-2xl mr-1 text-gray-400 font-bold">₹</span><span id="txn-result-amount">0.00</span>
+            </div>
+            <div class="w-full max-w-sm bg-gray-50 rounded-3xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-black border-2 border-white shadow-sm overflow-hidden">
+                        <span id="txn-result-initial">U</span>
+                        <img id="txn-result-dp" src="" class="w-full h-full object-cover hidden">
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Paid To</p>
+                        <p id="txn-result-name" class="text-lg font-black text-gray-800 leading-none">Name</p>
+                        <p id="txn-result-desc" class="text-xs font-bold text-gray-500 font-mono mt-1">Details</p>
+                    </div>
+                </div>
+                <div class="border-t border-dashed border-gray-300 pt-5 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Time</span>
+                        <span id="txn-result-date" class="text-xs font-black text-gray-800">Date</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Ref No.</span>
+                        <span id="txn-result-id" class="text-[10px] font-mono font-bold text-blue-500 bg-blue-50 border border-blue-100 px-2 py-1 rounded">ID</span>
+                    </div>
+                </div>
+                <div id="txn-result-error-box" class="hidden mt-5 p-4 bg-red-50 border border-red-100 rounded-xl">
+                    <p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> Error Details</p>
+                    <p id="txn-result-error-reason" class="text-sm font-bold text-red-600">Reason</p>
+                </div>
+                <div class="absolute -bottom-2 left-0 right-0 h-4 bg-white" style="mask-image: radial-gradient(circle at 10px 0, transparent 10px, black 11px); mask-size: 20px 20px; mask-repeat: repeat-x;"></div>
+            </div>
+        </div>
+        <button onclick="closeSuccessOverlay()" class="w-full max-w-sm mx-auto bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/30 btn-animate tracking-wide relative z-10">DONE</button>
+    </div>
 
     <!-- ===== SCRIPTS ===== -->
     <script src="script.js"></script>
 
-    <!-- Mobile sidebar helpers -->
     <script>
+        // Hide splash after 1.5s
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+        }, 1500);
+
+        // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('permanentSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -706,36 +1101,51 @@
             }
         }
         document.getElementById('sidebarOverlay').addEventListener('click', closeSidebarMobile);
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeSidebarMobile();
-        });
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebarMobile(); });
 
-        // Sync header with user data
+        // Update header helpers
         function updateHeaderUser(name) {
             document.getElementById('headerUserName').textContent = name || 'User';
             const avatarText = document.getElementById('headerAvatarText');
-            if (name && name.length > 0) {
-                avatarText.textContent = name.charAt(0).toUpperCase();
-            }
+            if (name && name.length > 0) avatarText.textContent = name.charAt(0).toUpperCase();
         }
         window.updateHeaderUser = updateHeaderUser;
-
         function updateHeaderAvatar(imgSrc) {
             const img = document.getElementById('headerAvatarImg');
             const text = document.getElementById('headerAvatarText');
             if (imgSrc && imgSrc.length > 0) {
-                img.src = imgSrc;
-                img.style.display = 'block';
-                text.style.display = 'none';
+                img.src = imgSrc; img.style.display = 'block'; text.style.display = 'none';
             } else {
-                img.style.display = 'none';
-                text.style.display = 'flex';
+                img.style.display = 'none'; text.style.display = 'flex';
             }
         }
         window.updateHeaderAvatar = updateHeaderAvatar;
 
-        // Call these from your existing script.js after login.
+        // Simple view navigation (your script.js already has showView, this is just a fallback)
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+            // Update sidebar active state (optional)
+            document.querySelectorAll('#permanentSidebar nav a').forEach(a => a.classList.remove('active'));
+            // You can add active class logic here if needed
+        }
+        window.showView = showView;
+
+        // Make sure global functions exist for modals (they are defined in script.js)
+        // These are just to prevent "undefined" errors if script.js hasn't loaded.
+        function processLogin() { console.log('Login'); }
+        function processSignupStep1() { console.log('Signup'); }
+        function processResetPinStep1() { console.log('Reset PIN'); }
+        function processResetPinStep2() { console.log('Reset PIN 2'); }
+        function verifyOTP() { console.log('Verify OTP'); }
+        function showAuthView(view) {
+            document.querySelectorAll('#auth-wrapper > div > div > div[id^="auth-"]').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('auth-' + view);
+            if (target) target.classList.remove('hidden');
+        }
+        window.showAuthView = showAuthView;
     </script>
 
 </body>
-</html>
+                                                                                                                         
