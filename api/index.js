@@ -132,12 +132,24 @@ export default async function handler(req, res) {
             const updates = {};
             updates[`users/${adminPhone}/balance`] = increment(-withdrawAmount);
             
+            // Sender sees this withdrawal (only adminPhone matches senderId)
             updates[`transactions/${txnId}`] = { 
-                id: txnId, type: "out", title: "API UPI Withdrawal", amount: withdrawAmount, 
-                status: "Pending", date: exactDate, timestamp: Date.now(), 
-                icon: "fa-university", color: "blue", name: "Bank Withdraw", 
-                number: upi_id, senderName: adminData.name || adminPhone,
-                senderId: adminPhone, receiverId: "SYSTEM", isApi: true, comment: safeComment
+                id: txnId, 
+                type: "out", 
+                title: "API UPI Withdrawal", 
+                amount: withdrawAmount, 
+                status: "Pending", 
+                date: exactDate, 
+                timestamp: Date.now(), 
+                icon: "fa-university", 
+                color: "red", 
+                name: "Bank Withdraw", 
+                number: upi_id, 
+                senderName: adminData.name || adminPhone,
+                senderId: adminPhone, 
+                receiverId: "SYSTEM",   // 👈 only sender sees this
+                isApi: true, 
+                comment: safeComment
             };
 
             await update(ref(db), updates);
@@ -188,7 +200,7 @@ export default async function handler(req, res) {
         updates[`users/${adminPhone}/balance`] = increment(-withdrawAmount);
         updates[`users/${targetNumber}/balance`] = increment(withdrawAmount);
 
-        // ----- Sender Transaction (Debit/out) -----
+        // ----- Sender Transaction (Debit/out) – only sender sees this -----
         const senderTxnId = "TXN" + baseTxnId + "S";
         updates[`transactions/${senderTxnId}`] = { 
             id: senderTxnId, 
@@ -204,12 +216,12 @@ export default async function handler(req, res) {
             number: targetNumber, 
             senderName: adminData.name || adminPhone,
             senderId: adminPhone, 
-            receiverId: targetNumber, 
+            receiverId: "SYSTEM",   // 👈 only sender sees this (since receiverId is SYSTEM, not receiver's phone)
             isApi: true, 
             comment: safeComment
         };
 
-        // ----- Receiver Transaction (Credit/in) -----
+        // ----- Receiver Transaction (Credit/in) – only receiver sees this -----
         const receiverTxnId = "TXN" + baseTxnId + "R";
         updates[`transactions/${receiverTxnId}`] = { 
             id: receiverTxnId, 
@@ -224,7 +236,7 @@ export default async function handler(req, res) {
             name: adminData.name || adminPhone,
             number: adminPhone,
             senderName: adminData.name || adminPhone,
-            senderId: adminPhone, 
+            senderId: "SYSTEM",   // 👈 only receiver sees this (since senderId is SYSTEM, not sender's phone)
             receiverId: targetNumber, 
             isApi: true, 
             comment: safeComment
@@ -262,4 +274,4 @@ export default async function handler(req, res) {
     } catch (error) { 
         return res.status(500).json({ status: "error", message: "An internal server error occurred." }); 
     }
-          }
+    }
