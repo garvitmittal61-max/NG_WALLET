@@ -83,7 +83,7 @@
             .scroll-content { padding:1rem; padding-bottom:6rem; }
         }
 
-        /* ===== DASHBOARD STYLES (EXACT MATCH FROM SCREENSHOT) ===== */
+        /* ===== DASHBOARD STYLES (EXACT MATCH) ===== */
         .balance-card {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
@@ -93,14 +93,14 @@
             overflow: hidden;
             box-shadow: 0 8px 30px rgba(37,99,235,0.35);
         }
-        .balance-card .balance-label { font-size:0.8rem; font-weight:500; opacity:0.85; letter-spacing:0.5px; }
-        .balance-card .balance-amount { font-size:2.8rem; font-weight:900; letter-spacing:-1px; margin:0.25rem 0 1rem; }
+        .balance-card .balance-label { font-size:0.75rem; font-weight:500; opacity:0.85; letter-spacing:0.5px; text-transform:uppercase; }
+        .balance-card .balance-amount { font-size:2.8rem; font-weight:900; letter-spacing:-1px; margin:0.1rem 0 0.75rem; }
         .balance-card .balance-details {
             display:grid;
             grid-template-columns:1fr 1fr;
             gap:0.5rem;
             border-top:1px solid rgba(255,255,255,0.15);
-            padding-top:1rem;
+            padding-top:0.75rem;
             margin-top:0.25rem;
         }
         .balance-card .balance-details .detail-item { font-size:0.75rem; opacity:0.9; }
@@ -121,7 +121,7 @@
         }
         .balance-card .member-since i { margin-right:0.3rem; }
 
-        /* Stats grid - exactly 4 columns */
+        /* Stats grid - exactly 4 columns with proper colors */
         .stats-grid {
             display:grid;
             grid-template-columns:repeat(4,1fr);
@@ -136,10 +136,24 @@
             border:1px solid #e2e8f0;
             box-shadow:0 1px 3px rgba(0,0,0,0.04);
         }
-        .stat-item .stat-number { font-weight:900; font-size:1.2rem; color:#0f172a; }
-        .stat-item .stat-label { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-top:0.1rem; }
+        .stat-item .stat-number { 
+            font-weight:900; 
+            font-size:1.2rem; 
+            color:#0f172a; 
+        }
+        .stat-item .stat-number.credit-color { color:#22c55e; }
+        .stat-item .stat-number.debit-color { color:#ef4444; }
+        .stat-item .stat-number.success-color { color:#2563eb; }
+        .stat-item .stat-label { 
+            font-size:0.6rem; 
+            font-weight:700; 
+            text-transform:uppercase; 
+            letter-spacing:0.5px; 
+            color:#94a3b8; 
+            margin-top:0.1rem; 
+        }
 
-        /* Quick Actions - exactly 4 buttons */
+        /* Quick Actions - exactly 4 buttons with proper icons */
         .quick-actions {
             display:grid;
             grid-template-columns:repeat(4,1fr);
@@ -157,11 +171,16 @@
             box-shadow:0 1px 3px rgba(0,0,0,0.04);
         }
         .quick-action-btn:hover { background:#f8fafc; border-color:#93c5fd; transform:translateY(-1px); }
-        .quick-action-btn i { font-size:1.5rem; color:#2563eb; display:block; margin-bottom:0.3rem; }
+        .quick-action-btn i { 
+            font-size:1.5rem; 
+            color:#2563eb; 
+            display:block; 
+            margin-bottom:0.3rem; 
+        }
         .quick-action-btn .action-label { font-size:0.7rem; font-weight:700; color:#1e293b; display:block; }
         .quick-action-btn .action-sub { font-size:0.55rem; color:#94a3b8; display:block; margin-top:0.1rem; }
 
-        /* Transaction items */
+        /* Transaction items with proper status badges */
         .txn-item {
             background:white;
             border-radius:0.75rem;
@@ -185,7 +204,14 @@
         .txn-item .txn-amount { font-weight:900; font-size:0.95rem; }
         .txn-item .txn-amount.credit { color:#22c55e; }
         .txn-item .txn-amount.debit { color:#ef4444; }
-        .txn-item .txn-status { font-size:0.55rem; font-weight:700; text-transform:uppercase; padding:0.15rem 0.6rem; border-radius:9999px; display:inline-block; }
+        .txn-item .txn-status { 
+            font-size:0.55rem; 
+            font-weight:700; 
+            text-transform:uppercase; 
+            padding:0.15rem 0.6rem; 
+            border-radius:9999px; 
+            display:inline-block; 
+        }
         .txn-status.success { background:#dcfce7; color:#16a34a; }
         .txn-status.pending { background:#fef9c3; color:#ca8a04; }
         .txn-status.failed { background:#fee2e2; color:#dc2626; }
@@ -417,7 +443,7 @@
                             <div class="verified-badge">Verified</div>
                         </div>
                         <div class="balance-details">
-                            <div class="detail-item"><i class="fas fa-phone-alt"></i> <span id="ui-card-phone">Loading...</span></div>
+                            <div class="detail-item"><i class="fas fa-lock"></i> <span id="ui-card-phone">Loading...</span></div>
                             <div class="detail-item"><i class="fas fa-envelope"></i> <span id="ui-card-email">Loading...</span></div>
                         </div>
                         <div class="member-since">
@@ -428,20 +454,20 @@
                     <!-- Stats Grid -->
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-number" id="prof-stats-total-credit">₹0</div>
-                            <div class="stat-label">Total Credit</div>
+                            <div class="stat-number credit-color" id="prof-stats-total-credit">₹0.00</div>
+                            <div class="stat-label">TOTAL CREDIT</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number" id="prof-stats-no-of-txns">0</div>
-                            <div class="stat-label">Successful</div>
+                            <div class="stat-number success-color" id="prof-stats-no-of-txns">0</div>
+                            <div class="stat-label">SUCCESSFUL</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number" id="prof-stats-total-debit">₹0</div>
-                            <div class="stat-label">Total Txns</div>
+                            <div class="stat-number debit-color" id="prof-stats-total-debit">₹0.00</div>
+                            <div class="stat-label">TOTAL TXNS</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number" id="prof-stats-success-rate">100%</div>
-                            <div class="stat-label">Success Rate</div>
+                            <div class="stat-number success-color" id="prof-stats-success-rate">100.0%</div>
+                            <div class="stat-label">SUCCESS RATE</div>
                         </div>
                     </div>
 
@@ -484,15 +510,11 @@
                             <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
                             <div class="txn-right"><div class="txn-amount bg-gray-200 rounded w-16 h-6"></div></div>
                         </div>
-                        <div class="txn-item skeleton-shimmer">
-                            <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
-                            <div class="txn-right"><div class="txn-amount bg-gray-200 rounded w-16 h-6"></div></div>
-                        </div>
                     </div>
 
                 </div>
 
-                <!-- ===== VIEW: TRANSACTIONS (game) – ORIGINAL ===== -->
+                <!-- ===== VIEW: TRANSACTIONS (game) ===== -->
                 <div id="view-game" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -527,7 +549,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: PROFILE (myprofile) – ORIGINAL ===== -->
+                <!-- ===== VIEW: PROFILE (myprofile) ===== -->
                 <div id="view-myprofile" class="view-section">
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-3">
@@ -597,7 +619,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: API – ORIGINAL ===== -->
+                <!-- ===== VIEW: API ===== -->
                 <div id="view-api" class="view-section">
                     <div class="flex items-center gap-3 mb-8">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -641,7 +663,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: LIFAFA – ORIGINAL ===== -->
+                <!-- ===== VIEW: LIFAFA ===== -->
                 <div id="view-lifafa" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -722,7 +744,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: ANNOUNCEMENTS (official) – ORIGINAL ===== -->
+                <!-- ===== VIEW: ANNOUNCEMENTS (official) ===== -->
                 <div id="view-official" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -732,7 +754,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: BOT ALERT (botalert) – ORIGINAL ===== -->
+                <!-- ===== VIEW: BOT ALERT (botalert) ===== -->
                 <div id="view-botalert" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('myprofile')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -791,7 +813,7 @@
     </div> <!-- end app-wrapper -->
 
     <!-- ============================================================== -->
-    <!-- ===== ALL MODALS (unchanged – exactly as you had) ===== -->
+    <!-- ===== ALL MODALS (unchanged – your originals) ===== -->
     <!-- ============================================================== -->
 
     <!-- Send Modal -->
@@ -1196,7 +1218,6 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="script.js"></script>
 
-    <!-- Additional script for sidebar and header sync -->
     <script>
         // Hide splash
         setTimeout(() => {
@@ -1241,7 +1262,7 @@
         }
         window.updateHeaderAvatar = updateHeaderAvatar;
 
-        // Fallback showView if script.js doesn't define it
+        // Fallback showView
         if (typeof showView === 'undefined') {
             window.showView = function(viewId) {
                 document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
