@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, set, update, runTransaction, increment } from "firebase/database";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDa3GLjZ_MZ5bSJDGneE2QyLmuhRmQ0SDw",
   authDomain: "ng-wallet-77227.firebaseapp.com",
@@ -16,7 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 2. Updated Bot Token
 const BOT_TOKEN = "8231479597:AAF36dz-AcERBw34QITLXlizDMtlGEFmUXM";
 
 function getExactDate() {
@@ -42,6 +41,7 @@ export default async function handler(req, res) {
         const action = body.action;
         const data = body.data || {};
 
+        // -------------------- EXISTING ACTIONS --------------------
         if (action === 'CLEAR_HISTORY') {
             const phone = data.phone;
             if(!phone) throw new Error("Missing user identification");
@@ -189,55 +189,216 @@ export default async function handler(req, res) {
             }
         }
 
+        // ======================== UPDATED EXECUTE_TXN ========================
         if (action === 'EXECUTE_TXN') {
             let amt = Number(data.amount) || 0;
-            const uSnap = await get(ref(db, `users/${data.sender}`));
+            const sender = data.sender;
+            const receiver = data.receiver || null;
+            const mode = data.mode;
+
+            // Validate sender exists
+            const uSnap = await get(ref(db, `users/${sender}`));
             if (!uSnap.exists()) throw new Error("User not found!");
             let sBal = Number(uSnap.val().balance) || 0;
             let sKeeper = Number(uSnap.val().keeperBalance) || 0;
             
-            if (['SEND', 'GHOST_SEND', 'WITHDRAW', 'KEEPER_LOCK'].includes(data.mode)) { if (sBal < amt) throw new Error("Insufficient Balance!"); }
-            if (data.mode === 'KEEPER_WITHDRAW') { if (sKeeper < amt) throw new Error("Insufficient Vault Balance!"); }
+            // Check balance
+            if (['SEND', 'GHOST_SEND', 'WITHDRAW', 'KEEPER_LOCK'].includes(mode)) {
+                if (sBal < amt) throw new Error("Insufficient Balance!");
+            }
+            if (mode === 'KEEPER_WITHDRAW') {
+                if (sKeeper < amt) throw new Error("Insufficient Vault Balance!");
+            }
 
             const updates = {};
-            if (data.mode === 'SEND' || data.mode === 'GHOST_SEND') {
-                const rSnap = await get(ref(db, `users/${data.receiver}`));
+            const txnIdBase = Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6);
+            const dateStr = getExactDate();
+
+            // ----- SEND / GHOST_SEND -----
+            if (mode === 'SEND' || mode === 'GHOST_SEND') {
+                if (!receiver) throw new Error("Receiver missing");
+                const rSnap = await get(ref(db, `users/${receiver}`));
                 if (!rSnap.exists()) throw new Error("Receiver not found!");
-                updates[`users/${data.sender}/balance`] = increment(-amt); 
-                updates[`users/${data.receiver}/balance`] = increment(amt);
+
+                // Update balances
+                updates[`users/${sender}/balance`] = increment(-amt);
+                updates[`users/${receiver}/balance`] = increment(amt);
+
+                // Sender transaction (Debit)
+                const senderTxnId = 'TXN' + txnIdBase + 'S';
+                updates[`transactions/${senderTxnId}`] = {
+                    id: senderTxnId,
+                    type: 'out',
+                    title: data.txn?.title || 'Transfer Sent',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: data.txn?.icon || 'fa-paper-plane',
+                    color: 'red',
+                    senderId: sender,
+                    receiverId: receiver,
+                    name: data.txn?.name || 'Transfer'
+                };
+
+                // Receiver transaction (Credit)
+                const receiverTxnId = 'TXN' + txnIdBase + 'R';
+                updates[`transactions/${receiverTxnId}`] = {
+                    id: receiverTxnId,
+                    type: 'in',
+                    title: data.txn?.title || 'Transfer Received',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: data.txn?.icon || 'fa-arrow-down',
+                    color: 'green',
+                    senderId: sender,
+                    receiverId: receiver,
+                    name: data.txn?.name || 'Transfer'
+                };
             }
-            else if (data.mode === 'WITHDRAW') updates[`users/${data.sender}/balance`] = increment(-amt);
-            else if (data.mode === 'KEEPER_LOCK') { updates[`users/${data.sender}/balance`] = increment(-amt); updates[`users/${data.sender}/keeperBalance`] = increment(amt); } 
-            else if (data.mode === 'KEEPER_WITHDRAW') { updates[`users/${data.sender}/keeperBalance`] = increment(-amt); updates[`users/${data.sender}/balance`] = increment(amt); } 
-            else if (data.mode === 'DEPOSIT') updates[`users/${data.sender}/balance`] = increment(amt);
-            
-            if(data.txn) {
-                data.txn.date = getExactDate();
-                updates[`transactions/${data.txn.id}`] = data.txn;
+
+            // ----- DEPOSIT -----
+            else if (mode === 'DEPOSIT') {
+                updates[`users/${sender}/balance`] = increment(amt);
+                const txnId = 'TXN' + txnIdBase;
+                updates[`transactions/${txnId}`] = {
+                    id: txnId,
+                    type: 'in',
+                    title: data.txn?.title || 'Deposit',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: data.txn?.icon || 'fa-plus-circle',
+                    color: 'green',
+                    senderId: 'SYSTEM',
+                    receiverId: sender,
+                    name: data.txn?.name || 'Deposit'
+                };
             }
-            await update(ref(db), updates); 
+
+            // ----- WITHDRAW -----
+            else if (mode === 'WITHDRAW') {
+                updates[`users/${sender}/balance`] = increment(-amt);
+                const txnId = 'TXN' + txnIdBase;
+                updates[`transactions/${txnId}`] = {
+                    id: txnId,
+                    type: 'out',
+                    title: data.txn?.title || 'Withdrawal',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: data.txn?.icon || 'fa-university',
+                    color: 'red',
+                    senderId: sender,
+                    receiverId: 'BANK',
+                    name: data.txn?.name || 'Bank'
+                };
+            }
+
+            // ----- KEEPER_LOCK -----
+            else if (mode === 'KEEPER_LOCK') {
+                updates[`users/${sender}/balance`] = increment(-amt);
+                updates[`users/${sender}/keeperBalance`] = increment(amt);
+                const txnId = 'TXN' + txnIdBase;
+                updates[`transactions/${txnId}`] = {
+                    id: txnId,
+                    type: 'out',
+                    title: 'Locked to Vault',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: 'fa-lock',
+                    color: 'blue',
+                    senderId: sender,
+                    receiverId: sender,
+                    name: 'Vault Lock'
+                };
+            }
+
+            // ----- KEEPER_WITHDRAW -----
+            else if (mode === 'KEEPER_WITHDRAW') {
+                updates[`users/${sender}/keeperBalance`] = increment(-amt);
+                updates[`users/${sender}/balance`] = increment(amt);
+                const txnId = 'TXN' + txnIdBase;
+                updates[`transactions/${txnId}`] = {
+                    id: txnId,
+                    type: 'in',
+                    title: 'Withdrawn from Vault',
+                    amount: amt,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: 'fa-unlock',
+                    color: 'green',
+                    senderId: sender,
+                    receiverId: sender,
+                    name: 'Vault Withdraw'
+                };
+            }
+
+            // Unknown mode – ignore
+            else {
+                throw new Error("Invalid transaction mode");
+            }
+
+            await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
 
+        // -------------------- BULK PAY (unchanged, but we'll keep the same logic) --------------------
         if (action === 'BULK_PAY') {
             let total = Number(data.amount) * data.receivers.length;
             const uSnap = await get(ref(db, `users/${data.sender}`));
             if (!uSnap.exists() || Number(uSnap.val().balance) < total) throw new Error("Insufficient Balance!");
             
             const updates = { [`users/${data.sender}/balance`]: increment(-total) };
+            const dateStr = getExactDate();
             for(let num of data.receivers) {
+                // Credit each receiver
                 updates[`users/${num}/balance`] = increment(Number(data.amount));
-                let tId = 'TXN' + Date.now().toString(36).toUpperCase();
-                updates[`transactions/${tId}`] = { id: tId, type: 'out', title: 'Bulk Send', amount: data.amount, status: 'Success', date: getExactDate(), timestamp: Date.now(), icon: 'fa-users', color: 'blue', senderId: data.sender, receiverId: num };
+                // Receiver transaction (Credit)
+                let tId = 'TXN' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2,4);
+                updates[`transactions/${tId}`] = { 
+                    id: tId, 
+                    type: 'in', 
+                    title: 'Bulk Send Received', 
+                    amount: Number(data.amount), 
+                    status: 'Success', 
+                    date: dateStr, 
+                    timestamp: Date.now(), 
+                    icon: 'fa-users', 
+                    color: 'green', 
+                    senderId: data.sender, 
+                    receiverId: num,
+                    name: 'Bulk Transfer'
+                };
             }
+            // Also create a sender transaction (Debit) for the bulk send
+            let senderTxnId = 'TXN' + Date.now().toString(36).toUpperCase() + 'B';
+            updates[`transactions/${senderTxnId}`] = {
+                id: senderTxnId,
+                type: 'out',
+                title: 'Bulk Send',
+                amount: total,
+                status: 'Success',
+                date: dateStr,
+                timestamp: Date.now(),
+                icon: 'fa-users',
+                color: 'red',
+                senderId: data.sender,
+                receiverId: 'BULK',
+                name: 'Bulk Transfer'
+            };
             await update(ref(db), updates);
             return res.json({ data: "Success" });
         }
 
-        // =====================================
-        // ADVANCED LIFAFA SYSTEM
-        // =====================================
-        
+        // ======================== LIFAFA SYSTEM (unchanged, but we keep transactions as is) ========================
         if (action === 'CREATE_LIFAFA') {
             const uSnap = await get(ref(db, `users/${data.phone}`));
             let totalDeduction = Number(data.totalDeduction);
@@ -263,13 +424,27 @@ export default async function handler(req, res) {
                 timestamp: Date.now()
             };
 
-            data.txn.date = getExactDate();
-
-            await update(ref(db), { 
-                [`users/${data.phone}/balance`]: increment(-totalDeduction), 
-                [`lifafas/${lifId}`]: lifafaData, 
-                [`transactions/${data.txn.id}`]: data.txn 
-            });
+            const dateStr = getExactDate();
+            const txnId = 'TXN' + Date.now().toString(36).toUpperCase();
+            const updates = {
+                [`users/${data.phone}/balance`]: increment(-totalDeduction),
+                [`lifafas/${lifId}`]: lifafaData,
+                [`transactions/${txnId}`]: {
+                    id: txnId,
+                    type: 'out',
+                    title: 'Lifafa Created',
+                    amount: totalDeduction,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: 'fa-envelope-open-text',
+                    color: 'blue',
+                    senderId: data.phone,
+                    receiverId: 'LIFAFA',
+                    name: 'Lifafa Lock'
+                }
+            };
+            await update(ref(db), updates);
             return res.json({ data: lifId });
         }
 
@@ -355,9 +530,22 @@ export default async function handler(req, res) {
             
             const updates = {};
             updates[`users/${data.phone}/balance`] = increment(reward); 
-            data.txn.date = getExactDate();
-            data.txn.amount = reward;
-            updates[`transactions/${data.txn.id}`] = data.txn;
+            const dateStr = getExactDate();
+            const txnId = 'TXN' + Date.now().toString(36).toUpperCase();
+            updates[`transactions/${txnId}`] = {
+                id: txnId,
+                type: 'in',
+                title: 'Lifafa Claim',
+                amount: reward,
+                status: 'Success',
+                date: dateStr,
+                timestamp: Date.now(),
+                icon: 'fa-envelope-open-text',
+                color: 'green',
+                senderId: 'LIFAFA',
+                receiverId: data.phone,
+                name: 'Lifafa Reward'
+            };
 
             // Handle Refer & Earn Reward
             if (lifafaData.referActive && data.referrerPhone && data.referrerPhone !== data.phone) {
@@ -366,11 +554,20 @@ export default async function handler(req, res) {
                     let referReward = Number(lifafaData.referAmount) || 0;
                     if (referReward > 0) {
                         updates[`users/${data.referrerPhone}/balance`] = increment(referReward);
-                        let refTxnId = 'TXN' + Date.now().toString(36).toUpperCase();
+                        let refTxnId = 'TXN' + Date.now().toString(36).toUpperCase() + 'R';
                         updates[`transactions/${refTxnId}`] = {
-                            id: refTxnId, type: 'in', title: 'Lifafa Referral Reward', amount: referReward,
-                            status: 'Success', date: getExactDate(), timestamp: Date.now(),
-                            icon: 'fa-user-plus', color: 'blue', senderId: 'SYSTEM', receiverId: data.referrerPhone, name: 'Referral System'
+                            id: refTxnId, 
+                            type: 'in', 
+                            title: 'Lifafa Referral Reward', 
+                            amount: referReward,
+                            status: 'Success', 
+                            date: dateStr, 
+                            timestamp: Date.now(),
+                            icon: 'fa-user-plus', 
+                            color: 'green', 
+                            senderId: 'SYSTEM', 
+                            receiverId: data.referrerPhone, 
+                            name: 'Referral System'
                         };
                     }
                 }
@@ -380,16 +577,32 @@ export default async function handler(req, res) {
             return res.json({ data: { amount: reward, type: lifafaData.type, referActive: lifafaData.referActive } });
         }
 
-        // =====================================
-        // GIFT CODES SYSTEM
-        // =====================================
+        // ======================== GIFT CODES SYSTEM (unchanged) ========================
         if (action === 'CREATE_GIFT') {
             let amt = Number(data.amount) || 0;
             const total = amt * data.users;
             const snap = await get(ref(db, `users/${data.phone}`));
             if (!snap.exists() || Number(snap.val().balance) < total) throw new Error("Insufficient Balance!");
-            data.txn.date = getExactDate();
-            const updates = { [`users/${data.phone}/balance`]: increment(-total), [`giftcodes/${data.code}`]: { amountPerUser: amt, remainingUsers: data.users, totalUsers: data.users, createdBy: data.phone }, [`transactions/${data.txn.id}`]: data.txn };
+            const dateStr = getExactDate();
+            const txnId = 'TXN' + Date.now().toString(36).toUpperCase();
+            const updates = {
+                [`users/${data.phone}/balance`]: increment(-total),
+                [`giftcodes/${data.code}`]: { amountPerUser: amt, remainingUsers: data.users, totalUsers: data.users, createdBy: data.phone },
+                [`transactions/${txnId}`]: {
+                    id: txnId,
+                    type: 'out',
+                    title: 'Gift Code Created',
+                    amount: total,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: 'fa-gift',
+                    color: 'blue',
+                    senderId: data.phone,
+                    receiverId: 'GIFT',
+                    name: 'Gift Code'
+                }
+            };
             await update(ref(db), updates); return res.json({ data: "Success" });
         }
 
@@ -402,19 +615,35 @@ export default async function handler(req, res) {
             if (!result.committed) throw new Error("Code invalid, expired, or already claimed.");
             
             resultAmount = Number(result.snapshot.val().amountPerUser);
-            
-            data.txn.date = getExactDate();
-            data.txn.amount = resultAmount;
-            const updates = { [`users/${data.phone}/balance`]: increment(resultAmount), [`transactions/${data.txn.id}`]: data.txn };
+            const dateStr = getExactDate();
+            const txnId = 'TXN' + Date.now().toString(36).toUpperCase();
+            const updates = {
+                [`users/${data.phone}/balance`]: increment(resultAmount),
+                [`transactions/${txnId}`]: {
+                    id: txnId,
+                    type: 'in',
+                    title: 'Gift Code Claimed',
+                    amount: resultAmount,
+                    status: 'Success',
+                    date: dateStr,
+                    timestamp: Date.now(),
+                    icon: 'fa-gift',
+                    color: 'green',
+                    senderId: 'GIFT',
+                    receiverId: data.phone,
+                    name: 'Gift Reward'
+                }
+            };
             if (result.snapshot.val().remainingUsers <= 0) updates[`giftcodes/${data.code}`] = null; 
             await update(ref(db), updates); return res.json({ data: resultAmount });
         }
 
         return res.status(400).json({ error: "Unknown Action" });
     } catch (e) { 
-        if (e.message && e.message.includes("Insufficient") || e.message.includes("not found") || e.message.includes("Password") || e.message.includes("join channel") || e.message.includes("already claimed")) {
+        if (e.message && (e.message.includes("Insufficient") || e.message.includes("not found") || e.message.includes("Password") || e.message.includes("join channel") || e.message.includes("already claimed"))) {
             return res.json({ error: e.message });
         }
+        console.error(e);
         return res.status(500).json({ error: "invalid" }); 
     }
-}
+              }
