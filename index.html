@@ -351,6 +351,14 @@
                     <li><a href="#" onclick="showView('api'); closeSidebarMobile()"><i class="fas fa-wallet"></i> Wallet API'S</a></li>
                     <li><a href="#" onclick="showView('game'); closeSidebarMobile()"><i class="fas fa-history"></i> Transactions</a></li>
                 </ul>
+                
+                <!-- ===== CHANGE PIN OPTION ===== -->
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                    <ul>
+                        <li><a href="#" onclick="showAuthView('reset-pin'); document.getElementById('auth-wrapper').classList.remove('hidden'); closeSidebarMobile()"><i class="fas fa-key"></i> Change Security PIN</a></li>
+                    </ul>
+                </div>
+                
                 <div class="mt-6 pt-4 border-t border-gray-200">
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-2">Support</p>
                     <ul>
@@ -1069,4 +1077,4 @@
         }
     </script>
 </body>
-    </html>
+                                               </html>
