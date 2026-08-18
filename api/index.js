@@ -181,19 +181,53 @@ export default async function handler(req, res) {
         let receiverData = receiverSnap.val() || {};
 
         const exactDate = getExactDate();
-        const txnId = "TXN" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
+        const baseTxnId = Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 4).toUpperCase();
 
         const updates = {};
         // Deduct from Sender, Add to Receiver
         updates[`users/${adminPhone}/balance`] = increment(-withdrawAmount);
         updates[`users/${targetNumber}/balance`] = increment(withdrawAmount);
 
-        updates[`transactions/${txnId}`] = { 
-            id: txnId, type: "out", title: "API Payment", amount: withdrawAmount, 
-            status: "Success", date: exactDate, timestamp: Date.now(), 
-            icon: "fa-code", color: "blue", name: receiverData.name || targetNumber, 
-            number: targetNumber, senderName: adminData.name || adminPhone,
-            senderId: adminPhone, receiverId: targetNumber, isApi: true, comment: safeComment
+        // ----- Sender Transaction (Debit/out) -----
+        const senderTxnId = "TXN" + baseTxnId + "S";
+        updates[`transactions/${senderTxnId}`] = { 
+            id: senderTxnId, 
+            type: "out", 
+            title: "API Payment Sent", 
+            amount: withdrawAmount, 
+            status: "Success", 
+            date: exactDate, 
+            timestamp: Date.now(), 
+            icon: "fa-code", 
+            color: "red", 
+            name: receiverData.name || targetNumber, 
+            number: targetNumber, 
+            senderName: adminData.name || adminPhone,
+            senderId: adminPhone, 
+            receiverId: targetNumber, 
+            isApi: true, 
+            comment: safeComment
+        };
+
+        // ----- Receiver Transaction (Credit/in) -----
+        const receiverTxnId = "TXN" + baseTxnId + "R";
+        updates[`transactions/${receiverTxnId}`] = { 
+            id: receiverTxnId, 
+            type: "in", 
+            title: "API Payment Received", 
+            amount: withdrawAmount, 
+            status: "Success", 
+            date: exactDate, 
+            timestamp: Date.now(), 
+            icon: "fa-code", 
+            color: "green", 
+            name: adminData.name || adminPhone,
+            number: adminPhone,
+            senderName: adminData.name || adminPhone,
+            senderId: adminPhone, 
+            receiverId: targetNumber, 
+            isApi: true, 
+            comment: safeComment
         };
 
         await update(ref(db), updates);
@@ -203,11 +237,11 @@ export default async function handler(req, res) {
 
         // Send Telegram Alerts
         if (adminData.tgUserId) {
-            let msg = `🤖 <b>NG SOLUTION API Payment Sent!</b>\nTo: ${rName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${txnId}`;
+            let msg = `🤖 <b>NG SOLUTION API Payment Sent!</b>\nTo: ${rName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${senderTxnId}`;
             sendTelegramMsg(adminData.tgUserId, msg);
         }
         if (receiverData.tgUserId) {
-            let msg = `💰 <b>NG SOLUTION API Payment Received!</b>\nFrom: ${aName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${txnId}`;
+            let msg = `💰 <b>NG SOLUTION API Payment Received!</b>\nFrom: ${aName}\nAmount: ₹${withdrawAmount}\nTxn ID: ${receiverTxnId}`;
             sendTelegramMsg(receiverData.tgUserId, msg);
         }
 
@@ -215,7 +249,8 @@ export default async function handler(req, res) {
             status: "success", 
             message: `Payment successful to ${targetNumber}`,
             data: { 
-                transaction_id: txnId, 
+                transaction_id: senderTxnId, 
+                receiver_transaction_id: receiverTxnId,
                 amount: withdrawAmount, 
                 receiver: targetNumber,
                 comment: safeComment,
@@ -227,4 +262,4 @@ export default async function handler(req, res) {
     } catch (error) { 
         return res.status(500).json({ status: "error", message: "An internal server error occurred." }); 
     }
-}
+          }
