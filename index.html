@@ -206,8 +206,8 @@
         <button onclick="logoutUser()" class="px-8 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold tracking-wide">Logout</button>
     </div>
 
-    <!-- ===== AUTH WRAPPER ===== -->
-    <div id="auth-wrapper" class="fixed inset-0 bg-white z-40 hidden flex items-center justify-center p-6 pb-20 overflow-y-auto no-scrollbar">
+    <!-- ===== AUTH WRAPPER – VISIBLE BY DEFAULT ===== -->
+    <div id="auth-wrapper" class="fixed inset-0 bg-white z-40 flex items-center justify-center p-6 pb-20 overflow-y-auto no-scrollbar">
         <div class="w-full max-w-sm mt-10">
             <div class="text-center mb-10">
                 <div class="w-20 h-20 bg-blue-600 rounded-3xl shadow-xl flex items-center justify-center text-white text-4xl mx-auto mb-6">
@@ -277,10 +277,8 @@
         </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- ===== APP LAYOUT ===== -->
-    <!-- ============================================================== -->
-    <div class="app-wrapper">
+    <!-- ===== APP LAYOUT (hidden until login) ===== -->
+    <div id="app-wrapper" class="app-wrapper" style="display:none;">
 
         <!-- Sidebar overlay (mobile) -->
         <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -346,7 +344,7 @@
             <!-- SCROLLABLE CONTENT -->
             <div class="scroll-content" id="mainScroll">
 
-                <!-- ===== HOME (DASHBOARD) ===== -->
+                <!-- HOME (DASHBOARD) -->
                 <div id="view-home" class="view-section active">
                     <div class="flex justify-between items-center mb-4">
                         <div>
@@ -435,7 +433,8 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: TRANSACTIONS ===== -->
+                <!-- ===== OTHER VIEWS ===== -->
+                <!-- Transactions -->
                 <div id="view-game" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -466,7 +465,7 @@
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden" id="stats-txn-list"></div>
                 </div>
 
-                <!-- ===== VIEW: PROFILE ===== -->
+                <!-- Profile -->
                 <div id="view-myprofile" class="view-section">
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-3">
@@ -529,7 +528,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: API ===== -->
+                <!-- API -->
                 <div id="view-api" class="view-section">
                     <div class="flex items-center gap-3 mb-8">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -566,7 +565,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: LIFAFA ===== -->
+                <!-- Lifafa -->
                 <div id="view-lifafa" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -637,7 +636,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: ANNOUNCEMENTS ===== -->
+                <!-- Announcements -->
                 <div id="view-official" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -646,7 +645,7 @@
                     <div id="official-posts-container" class="space-y-4 pb-20 flex flex-col justify-end min-h-[60vh]"></div>
                 </div>
 
-                <!-- ===== VIEW: BOT ALERT ===== -->
+                <!-- Bot Alert -->
                 <div id="view-botalert" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('myprofile')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -672,7 +671,7 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: BULK PAY (placeholder) ===== -->
+                <!-- Placeholders -->
                 <div id="view-bulk-pay" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -685,7 +684,6 @@
                     </div>
                 </div>
 
-                <!-- ===== VIEW: UPI API (placeholder) ===== -->
                 <div id="view-upi-api" class="view-section">
                     <div class="flex items-center gap-3 mb-6">
                         <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
@@ -703,7 +701,7 @@
     </div> <!-- end app-wrapper -->
 
     <!-- ============================================================== -->
-    <!-- ===== ALL MODALS ===== -->
+    <!-- ===== ALL MODALS (unchanged) ===== -->
     <!-- ============================================================== -->
 
     <!-- Send Modal -->
@@ -1121,32 +1119,45 @@
         }
         window.updateHeaderAvatar = updateHeaderAvatar;
 
-        // Simple view navigation (your script.js already has showView, this is just a fallback)
+        // showView (for sidebar navigation)
         function showView(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             const target = document.getElementById('view-' + viewId);
             if (target) target.classList.add('active');
-            // Update sidebar active state (optional)
-            document.querySelectorAll('#permanentSidebar nav a').forEach(a => a.classList.remove('active'));
-            // You can add active class logic here if needed
         }
         window.showView = showView;
 
-        // Make sure global functions exist for modals (they are defined in script.js)
-        // These are just to prevent "undefined" errors if script.js hasn't loaded.
-        function processLogin() { console.log('Login'); }
-        function processSignupStep1() { console.log('Signup'); }
-        function processResetPinStep1() { console.log('Reset PIN'); }
-        function processResetPinStep2() { console.log('Reset PIN 2'); }
-        function verifyOTP() { console.log('Verify OTP'); }
+        // Auth view switching
         function showAuthView(view) {
-            document.querySelectorAll('#auth-wrapper > div > div > div[id^="auth-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#auth-wrapper .theme-card').forEach(el => el.classList.add('hidden'));
             const target = document.getElementById('auth-' + view);
             if (target) target.classList.remove('hidden');
         }
         window.showAuthView = showAuthView;
+
+        // Expose logoutUser globally (your script.js will override)
+        window.logoutUser = function() {
+            if (confirm('Logout?')) {
+                document.getElementById('app-wrapper').style.display = 'none';
+                document.getElementById('auth-wrapper').style.display = 'flex';
+                // reset auth views
+                showAuthView('login');
+            }
+        };
+
+        // Override processLogin to show the dashboard (temporary if script.js fails)
+        const originalProcessLogin = window.processLogin;
+        window.processLogin = function() {
+            if (originalProcessLogin) {
+                originalProcessLogin();
+            } else {
+                // fallback: show dashboard
+                document.getElementById('auth-wrapper').style.display = 'none';
+                document.getElementById('app-wrapper').style.display = 'flex';
+                document.getElementById('view-home').classList.add('active');
+            }
+        };
     </script>
 
 </body>
 </html>
-                                                                                                                         
