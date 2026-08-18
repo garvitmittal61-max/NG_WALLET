@@ -1024,6 +1024,53 @@ function searchTxn() {
     if(txn) { openTxnModal(txn.id); document.getElementById('search-txn-id').value = ''; } else { showToast("Transaction not found in your history."); }
 }
 
+// ==============================================================
+// NEW: CHANGE PIN MODAL FUNCTIONS (Direct 4-digit PIN change)
+// ==============================================================
+
+function openChangePinModal() {
+    document.getElementById('changePinModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('changePinModal').classList.remove('opacity-0'), 10);
+    // Clear fields
+    document.getElementById('old-pin').value = '';
+    document.getElementById('new-pin').value = '';
+    document.getElementById('confirm-pin').value = '';
+}
+
+function closeChangePinModal() {
+    document.getElementById('changePinModal').classList.add('opacity-0');
+    setTimeout(() => document.getElementById('changePinModal').classList.add('hidden'), 300);
+}
+
+async function processChangePin() {
+    let oldPin = document.getElementById('old-pin').value.trim();
+    let newPin = document.getElementById('new-pin').value.trim();
+    let confirmPin = document.getElementById('confirm-pin').value.trim();
+
+    if (!oldPin || !newPin || !confirmPin) return showToast("All fields are required!");
+    if (oldPin.length !== 4 || newPin.length !== 4 || confirmPin.length !== 4) return showToast("PIN must be exactly 4 digits!");
+    if (oldPin !== currentUser?.pin) return showToast("Current PIN is incorrect!");
+    if (newPin !== confirmPin) return showToast("New PIN and Confirm PIN do not match!");
+    if (newPin === oldPin) return showToast("New PIN must be different from current PIN!");
+
+    try {
+        // Get current password from user object
+        let currentPassword = currentUser.password;
+        await apiCall('UPDATE_CREDS', {
+            phone: currentUser.phone,
+            password: currentPassword,
+            pin: newPin
+        });
+        // Update local user object
+        currentUser.pin = newPin;
+        updateProfileDashboardUI();
+        showToast("PIN updated successfully!");
+        closeChangePinModal();
+    } catch (e) {
+        showToast(e.message || "Failed to update PIN.");
+    }
+}
+
 window.onload = async () => {
     await handleSplashScreen();
     await checkAuth();
