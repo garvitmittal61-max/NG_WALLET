@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NG SOLUTION</title>
+    <title>ULTRA PAY | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -17,8 +17,8 @@
     </script>
 
     <style>
-        /* ===== NEW LAYOUT (white sidebar) ===== */
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', system-ui, sans-serif; }
+        /* ===== LAYOUT ===== */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, system-ui, sans-serif; }
         body { background:#f1f5f9; overflow:hidden; height:100vh; }
 
         .app-wrapper { display:flex; height:100vh; overflow:hidden; }
@@ -63,14 +63,11 @@
         header .avatar { width:2.5rem; height:2.5rem; border-radius:9999px; background:#dbeafe; display:flex; align-items:center; justify-content:center; font-weight:700; color:#2563eb; border:2px solid white; box-shadow:0 1px 3px rgba(0,0,0,0.05); overflow:hidden; }
         header .avatar img { width:100%; height:100%; object-fit:cover; display:none; }
 
-        /* Scrollable content */
         .scroll-content { flex:1; overflow-y:auto; padding:1.5rem; padding-bottom:7rem; }
 
-        /* View sections (already defined) */
         .view-section { display:none; }
         .view-section.active { display:block; }
 
-        /* Mobile sidebar */
         @media (max-width:768px) {
             .sidebar-white {
                 position:fixed; top:0; left:0; height:100%; z-index:60;
@@ -86,84 +83,167 @@
             .scroll-content { padding:1rem; padding-bottom:6rem; }
         }
 
-        /* ===== DASHBOARD (new UI) ===== */
+        /* ===== DASHBOARD STYLES (EXACT MATCH FROM SCREENSHOT) ===== */
         .balance-card {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
             border-radius: 1.5rem;
             padding: 1.5rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(59,130,246,0.3);
+            box-shadow: 0 8px 30px rgba(37,99,235,0.35);
         }
-        .balance-card .balance-amount { font-size:2.5rem; font-weight:900; letter-spacing:-0.5px; margin:0.25rem 0 1rem; }
-        .balance-card .user-detail {
-            display:flex; justify-content:space-between; font-size:0.8rem; opacity:0.9;
-            border-top:1px solid rgba(255,255,255,0.15); padding-top:0.75rem; margin-top:0.5rem;
+        .balance-card .balance-label { font-size:0.8rem; font-weight:500; opacity:0.85; letter-spacing:0.5px; }
+        .balance-card .balance-amount { font-size:2.8rem; font-weight:900; letter-spacing:-1px; margin:0.25rem 0 1rem; }
+        .balance-card .balance-details {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:0.5rem;
+            border-top:1px solid rgba(255,255,255,0.15);
+            padding-top:1rem;
+            margin-top:0.25rem;
         }
-        .balance-card .user-detail span i { margin-right:0.3rem; width:1.2rem; }
-        .balance-card .member-since { font-size:0.75rem; opacity:0.8; margin-top:0.25rem; }
+        .balance-card .balance-details .detail-item { font-size:0.75rem; opacity:0.9; }
+        .balance-card .balance-details .detail-item i { width:1.2rem; margin-right:0.3rem; }
+        .balance-card .verified-badge {
+            background:rgba(255,255,255,0.2);
+            border-radius:9999px;
+            padding:0.2rem 0.8rem;
+            font-size:0.65rem;
+            font-weight:700;
+            backdrop-filter:blur(4px);
+            display:inline-block;
+        }
+        .balance-card .member-since {
+            font-size:0.7rem;
+            opacity:0.8;
+            margin-top:0.5rem;
+        }
         .balance-card .member-since i { margin-right:0.3rem; }
 
+        /* Stats grid - exactly 4 columns */
         .stats-grid {
-            display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin:1.5rem 0;
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:0.75rem;
+            margin:1.25rem 0;
         }
         .stat-item {
-            background:white; border-radius:1rem; padding:0.75rem 0.5rem; text-align:center;
-            border:1px solid #e2e8f0; box-shadow:0 1px 2px rgba(0,0,0,0.04);
+            background:white;
+            border-radius:1rem;
+            padding:0.8rem 0.3rem;
+            text-align:center;
+            border:1px solid #e2e8f0;
+            box-shadow:0 1px 3px rgba(0,0,0,0.04);
         }
         .stat-item .stat-number { font-weight:900; font-size:1.2rem; color:#0f172a; }
-        .stat-item .stat-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-top:0.1rem; }
+        .stat-item .stat-label { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-top:0.1rem; }
 
+        /* Quick Actions - exactly 4 buttons */
         .quick-actions {
-            display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin:1.5rem 0;
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:0.75rem;
+            margin:1.25rem 0;
         }
         .quick-action-btn {
-            background:white; border:1px solid #e2e8f0; border-radius:1rem; padding:0.75rem 0.25rem;
-            text-align:center; transition:all 0.2s; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.04);
+            background:white;
+            border:1px solid #e2e8f0;
+            border-radius:1rem;
+            padding:0.9rem 0.25rem;
+            text-align:center;
+            cursor:pointer;
+            transition:all 0.2s;
+            box-shadow:0 1px 3px rgba(0,0,0,0.04);
         }
-        .quick-action-btn:hover { background:#f8fafc; border-color:#93c5fd; }
-        .quick-action-btn i { font-size:1.5rem; color:#3b82f6; display:block; margin-bottom:0.25rem; }
-        .quick-action-btn span { font-size:0.7rem; font-weight:700; color:#334155; display:block; }
-        .quick-action-btn small { font-size:0.6rem; color:#94a3b8; display:block; margin-top:0.15rem; }
+        .quick-action-btn:hover { background:#f8fafc; border-color:#93c5fd; transform:translateY(-1px); }
+        .quick-action-btn i { font-size:1.5rem; color:#2563eb; display:block; margin-bottom:0.3rem; }
+        .quick-action-btn .action-label { font-size:0.7rem; font-weight:700; color:#1e293b; display:block; }
+        .quick-action-btn .action-sub { font-size:0.55rem; color:#94a3b8; display:block; margin-top:0.1rem; }
 
-        /* Transaction items (already styled in your existing CSS, but we'll keep it consistent) */
+        /* Transaction items */
         .txn-item {
-            background:white; border-radius:1rem; padding:0.75rem 1rem; border:1px solid #e2e8f0;
-            margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;
+            background:white;
+            border-radius:0.75rem;
+            padding:0.7rem 1rem;
+            border:1px solid #e2e8f0;
+            margin-bottom:0.65rem;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
         }
-        .txn-item .txn-left { display:flex; align-items:center; gap:0.75rem; flex:1; }
-        .txn-item .txn-icon { width:2.5rem; height:2.5rem; border-radius:9999px; background:#eef2ff; display:flex; align-items:center; justify-content:center; color:#3b82f6; }
-        .txn-item .txn-info { flex:1; }
-        .txn-item .txn-info .txn-name { font-weight:700; color:#0f172a; font-size:0.9rem; }
-        .txn-item .txn-info .txn-desc { font-size:0.7rem; color:#64748b; }
-        .txn-item .txn-amount { font-weight:900; font-size:1rem; }
+        .txn-item .txn-left { display:flex; align-items:center; gap:0.75rem; flex:1; min-width:0; }
+        .txn-item .txn-icon {
+            width:2.2rem; height:2.2rem; border-radius:9999px;
+            background:#eef2ff; display:flex; align-items:center; justify-content:center;
+            color:#2563eb; flex-shrink:0;
+        }
+        .txn-item .txn-info { flex:1; min-width:0; }
+        .txn-item .txn-info .txn-name { font-weight:700; color:#0f172a; font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .txn-item .txn-info .txn-desc { font-size:0.65rem; color:#64748b; }
+        .txn-item .txn-right { text-align:right; flex-shrink:0; margin-left:0.5rem; }
+        .txn-item .txn-amount { font-weight:900; font-size:0.95rem; }
         .txn-item .txn-amount.credit { color:#22c55e; }
         .txn-item .txn-amount.debit { color:#ef4444; }
-        .txn-item .txn-status { font-size:0.6rem; font-weight:700; text-transform:uppercase; padding:0.2rem 0.6rem; border-radius:9999px; }
+        .txn-item .txn-status { font-size:0.55rem; font-weight:700; text-transform:uppercase; padding:0.15rem 0.6rem; border-radius:9999px; display:inline-block; }
         .txn-status.success { background:#dcfce7; color:#16a34a; }
         .txn-status.pending { background:#fef9c3; color:#ca8a04; }
         .txn-status.failed { background:#fee2e2; color:#dc2626; }
 
-        /* Keep all your existing styles from style.css (they will still apply) */
+        /* Auth forms */
+        .theme-card { background:white; border-radius:1.5rem; }
+        .focus-accent:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.2); }
+        .btn-animate { transition:all 0.15s; }
+        .btn-animate:active { transform:scale(0.97); }
+
+        /* Toggle switch */
+        .toggle-switch { position:relative; display:inline-block; width:48px; height:28px; flex-shrink:0; }
+        .toggle-switch input { opacity:0; width:0; height:0; }
+        .toggle-switch .slider { position:absolute; cursor:pointer; inset:0; background:#cbd5e1; transition:0.3s; border-radius:9999px; }
+        .toggle-switch .slider:before { content:""; position:absolute; height:20px; width:20px; left:4px; bottom:4px; background:white; transition:0.3s; border-radius:50%; }
+        .toggle-switch input:checked + .slider { background:#2563eb; }
+        .toggle-switch input:checked + .slider:before { transform:translateX(20px); }
+
+        /* API cards */
+        .api-card { background:white; border-radius:1.5rem; border:1px solid #e2e8f0; overflow:hidden; margin-bottom:1.5rem; }
+        .api-header { padding:1rem 1.5rem; background:#f8fafc; border-bottom:1px solid #e2e8f0; font-weight:700; display:flex; align-items:center; gap:0.75rem; }
+        .api-content { padding:1.5rem; }
+        .api-code-block { background:#0f172a; color:#e2e8f0; padding:0.75rem 1rem; border-radius:0.75rem; font-size:0.7rem; font-family:monospace; word-break:break-all; position:relative; }
+
+        .no-scrollbar::-webkit-scrollbar { display:none; }
+        .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+
+        /* Public Lifafa */
+        .lifafa-float { animation:lifafaFloat 3s ease-in-out infinite; }
+        @keyframes lifafaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+        /* Rocket */
+        .straight-rocket-wrapper { position:relative; width:100%; height:200px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+        .straight-rocket { font-size:5rem; animation:rocketLaunch 1.5s ease-out forwards; }
+        .rocket-fire { width:30px; height:40px; background:linear-gradient(to top, #f97316, #ef4444, transparent); border-radius:0 0 50% 50%; margin-top:-10px; animation:fireFlicker 0.2s infinite alternate; }
+        @keyframes rocketLaunch { 0%{transform:translateY(100px) scale(0.5); opacity:0;} 100%{transform:translateY(0) scale(1); opacity:1;} }
+        @keyframes fireFlicker { 0%{transform:scaleX(0.8) scaleY(1); opacity:0.8;} 100%{transform:scaleX(1.2) scaleY(0.8); opacity:1;} }
+        .rocket-ground { width:100%; height:4px; background:linear-gradient(to right, transparent, #94a3b8, transparent); margin-top:10px; border-radius:9999px; }
+        .skeleton-shimmer { animation:shimmer 1.5s infinite; background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%); background-size:200% 100%; }
+        @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden selection:bg-blue-500 selection:text-white">
+<body>
 
-    <!-- ===== SPLASH SCREEN (unchanged) ===== -->
+    <!-- ===== SPLASH ===== -->
     <div id="splash-screen" class="fixed inset-0 bg-blue-500 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="w-24 h-24 bg-white rounded-3xl shadow-2xl flex items-center justify-center text-blue-500 text-5xl mb-6 animate-bounce">
             <i class="fas fa-wallet"></i>
         </div>
-        <h1 class="text-3xl font-black text-white tracking-widest mb-2">NG SOLUTION</h1>
+        <h1 class="text-3xl font-black text-white tracking-widest mb-2">ULTRA PAY</h1>
         <p class="text-blue-100 text-sm font-bold tracking-widest uppercase">Secure Wallet</p>
     </div>
 
-    <!-- ===== MAINTENANCE / BANNED (unchanged) ===== -->
+    <!-- ===== MAINTENANCE / BANNED ===== -->
     <div id="maintenance-wrapper" class="fixed inset-0 bg-white z-50 hidden flex-col items-center justify-center p-6 text-center">
         <i class="fas fa-tools text-6xl text-blue-500 mb-6 animate-pulse"></i>
         <h2 class="text-2xl font-black text-gray-800 mb-2 tracking-wide">System Update</h2>
-        <p class="text-gray-500 font-medium mb-8">We are upgrading NG SOLUTION. Please check back shortly.</p>
+        <p class="text-gray-500 font-medium mb-8">We are upgrading ULTRA PAY. Please check back shortly.</p>
         <button id="help-support-link" class="px-8 py-4 bg-blue-500 text-white rounded-xl font-bold tracking-wide shadow-lg shadow-blue-500/30">Contact Support</button>
     </div>
 
@@ -174,14 +254,14 @@
         <button onclick="logoutUser()" class="px-8 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold tracking-wide">Logout</button>
     </div>
 
-    <!-- ===== AUTH WRAPPER (unchanged) ===== -->
+    <!-- ===== AUTH WRAPPER ===== -->
     <div id="auth-wrapper" class="fixed inset-0 bg-white z-40 hidden flex items-center justify-center p-6 pb-20 overflow-y-auto no-scrollbar">
         <div class="w-full max-w-sm mt-10">
             <div class="text-center mb-10">
                 <div class="w-20 h-20 bg-blue-600 rounded-3xl shadow-xl flex items-center justify-center text-white text-4xl mx-auto mb-6">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <h1 class="text-3xl font-black text-gray-800 tracking-tight mb-2">NG SOLUTION</h1>
+                <h1 class="text-3xl font-black text-gray-800 tracking-tight mb-2">ULTRA PAY</h1>
                 <p class="text-gray-400 font-bold text-sm tracking-widest uppercase">Sign In to Continue</p>
             </div>
 
@@ -248,7 +328,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- ===== NEW APP LAYOUT (white sidebar + main) ===== -->
+    <!-- ===== APP LAYOUT (ULTRA PAY DASHBOARD) ===== -->
     <!-- ============================================================== -->
     <div class="app-wrapper">
 
@@ -258,7 +338,7 @@
         <!-- WHITE SIDEBAR -->
         <aside id="permanentSidebar" class="sidebar-white">
             <div class="brand-area">
-                <h1>Ultra Pay</h1>
+                <h1>ULTRA PAY</h1>
                 <span>V1.0.0</span>
             </div>
             <nav>
@@ -297,7 +377,7 @@
                     </button>
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-black"><i class="fas fa-wallet"></i></div>
-                        <span class="font-black text-lg text-gray-800 hidden sm:inline">NG SOLUTION</span>
+                        <span class="font-black text-lg text-gray-800 hidden sm:inline">ULTRA PAY</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -316,8 +396,10 @@
             <!-- SCROLLABLE CONTENT -->
             <div class="scroll-content" id="mainScroll">
 
-                <!-- ===== HOME (NEW DASHBOARD UI) ===== -->
+                <!-- ===== HOME (ULTRA PAY DASHBOARD) ===== -->
                 <div id="view-home" class="view-section active">
+
+                    <!-- Dashboard Title -->
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h2 class="text-2xl font-black text-gray-800 tracking-tight">Dashboard</h2>
@@ -329,21 +411,21 @@
                     <div class="balance-card">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm font-medium opacity-80">AVAILABLE BALANCE</p>
+                                <p class="balance-label">AVAILABLE BALANCE</p>
                                 <div class="balance-amount">₹<span class="global-balance">0.00</span></div>
                             </div>
-                            <div class="bg-white/20 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm">Verified</div>
+                            <div class="verified-badge">Verified</div>
                         </div>
-                        <div class="user-detail">
-                            <span><i class="fas fa-phone-alt"></i> <span id="ui-card-phone">Loading...</span></span>
-                            <span><i class="fas fa-envelope"></i> <span id="ui-card-email">Loading...</span></span>
+                        <div class="balance-details">
+                            <div class="detail-item"><i class="fas fa-phone-alt"></i> <span id="ui-card-phone">Loading...</span></div>
+                            <div class="detail-item"><i class="fas fa-envelope"></i> <span id="ui-card-email">Loading...</span></div>
                         </div>
                         <div class="member-since">
                             <i class="fas fa-clock"></i> Member since <span id="member-since-date">15 Aug 2026</span>
                         </div>
                     </div>
 
-                    <!-- Stats -->
+                    <!-- Stats Grid -->
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-number" id="prof-stats-total-credit">₹0</div>
@@ -367,42 +449,47 @@
                     <div class="quick-actions">
                         <div class="quick-action-btn" onclick="document.getElementById('actionModalAdd').classList.remove('hidden'); setTimeout(()=>document.getElementById('actionModalAdd').classList.remove('opacity-0'),10);">
                             <i class="fas fa-plus-circle"></i>
-                            <span>Add Fund</span>
-                            <small>Instant Top-up</small>
+                            <span class="action-label">Add Fund</span>
+                            <span class="action-sub">Instant Top-up</span>
                         </div>
                         <div class="quick-action-btn" onclick="document.getElementById('actionModalWithdraw').classList.remove('hidden'); setTimeout(()=>document.getElementById('actionModalWithdraw').classList.remove('opacity-0'),10);">
                             <i class="fas fa-university"></i>
-                            <span>Withdraw</span>
-                            <small>To Bank</small>
+                            <span class="action-label">Withdraw</span>
+                            <span class="action-sub">To Bank</span>
                         </div>
                         <div class="quick-action-btn" onclick="document.getElementById('actionModalSend').classList.remove('hidden'); setTimeout(()=>document.getElementById('actionModalSend').classList.remove('opacity-0'),10);">
                             <i class="fas fa-paper-plane"></i>
-                            <span>Pay User</span>
-                            <small>Wallet Transfer</small>
+                            <span class="action-label">Pay User</span>
+                            <span class="action-sub">Wallet Transfer</span>
                         </div>
                         <div class="quick-action-btn" onclick="showView('botalert')">
                             <i class="fas fa-bell"></i>
-                            <span>Bot Alert</span>
-                            <small>Get Notified</small>
+                            <span class="action-label">Bot Alert</span>
+                            <span class="action-sub">Get Notified</span>
                         </div>
                     </div>
 
                     <!-- Recent Transactions -->
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-black text-gray-800">Recent Transactions</h3>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-md font-black text-gray-800">Recent Transactions</h3>
                         <button onclick="showView('game')" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">View All</button>
                     </div>
                     <div id="home-txn-list">
                         <!-- Populated by script.js -->
                         <div class="txn-item skeleton-shimmer">
                             <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
-                            <div class="txn-amount bg-gray-200 rounded w-16 h-6"></div>
+                            <div class="txn-right"><div class="txn-amount bg-gray-200 rounded w-16 h-6"></div></div>
                         </div>
                         <div class="txn-item skeleton-shimmer">
                             <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
-                            <div class="txn-amount bg-gray-200 rounded w-16 h-6"></div>
+                            <div class="txn-right"><div class="txn-amount bg-gray-200 rounded w-16 h-6"></div></div>
+                        </div>
+                        <div class="txn-item skeleton-shimmer">
+                            <div class="txn-left"><div class="txn-icon bg-gray-200"></div><div class="txn-info"><div class="h-4 w-32 bg-gray-200 rounded"></div><div class="h-3 w-24 bg-gray-200 rounded mt-1"></div></div></div>
+                            <div class="txn-right"><div class="txn-amount bg-gray-200 rounded w-16 h-6"></div></div>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- ===== VIEW: TRANSACTIONS (game) – ORIGINAL ===== -->
@@ -445,13 +532,11 @@
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-3">
                             <button onclick="showView('home')" class="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-800 flex items-center justify-center shadow-sm"><i class="fas fa-arrow-left"></i></button>
+                            <h2 class="text-2xl font-black text-gray-800">Profile</h2>
                         </div>
-                        <!-- Original profile content... I'll keep it exactly as you had -->
-                        <h2 class="text-2xl font-black text-gray-800">Profile</h2>
                         <button onclick="editProfileName()" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm hover:bg-blue-100 transition-colors border border-blue-100"><i class="fas fa-pen text-sm"></i></button>
                     </div>
-                    <!-- Paste your original profile HTML here (I'll copy from your original) -->
-                    <!-- I'll copy the original profile content from your old HTML -->
+
                     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center mb-6 relative">
                         <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full mb-4 border-4 border-white shadow-lg relative overflow-hidden flex items-center justify-center text-4xl font-black text-blue-500">
                             <span id="profile-dashboard-initial" class="absolute inset-0 flex items-center justify-center">U</span>
@@ -708,14 +793,8 @@
     <!-- ============================================================== -->
     <!-- ===== ALL MODALS (unchanged – exactly as you had) ===== -->
     <!-- ============================================================== -->
-    <!-- I'll paste all your modals from the original file here. -->
-    <!-- Since you already have them in your file, I'll include a placeholder comment. -->
-    <!-- But for completeness, I'll copy the entire modal section from your original. -->
 
-    <!-- Your modals: actionModalSend, actionModalWithdraw, actionModalAdd, actionModalReceive, actionModalScan, actionModalBulk, actionModalGift, actionModalKeeper, customIdModal, public-lifafa-wrapper, toast, txnModal, txn-result-overlay -->
-    <!-- I'll now include them exactly as you had them, so you don't lose anything. -->
-
-    <!-- ===== SEND MODAL ===== -->
+    <!-- Send Modal -->
     <div id="actionModalSend" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -736,7 +815,7 @@
         </div>
     </div>
 
-    <!-- ===== WITHDRAW MODAL ===== -->
+    <!-- Withdraw Modal -->
     <div id="actionModalWithdraw" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -756,7 +835,7 @@
         </div>
     </div>
 
-    <!-- ===== ADD FUNDS MODAL ===== -->
+    <!-- Add Funds Modal -->
     <div id="actionModalAdd" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -794,7 +873,7 @@
         </div>
     </div>
 
-    <!-- ===== RECEIVE MODAL ===== -->
+    <!-- Receive Modal -->
     <div id="actionModalReceive" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 transform transition-transform duration-300 scale-95 shadow-2xl border border-gray-100 text-center relative">
             <button onclick="document.getElementById('actionModalReceive').classList.add('opacity-0'); setTimeout(()=>document.getElementById('actionModalReceive').classList.add('hidden'),300);" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
@@ -812,7 +891,7 @@
         </div>
     </div>
 
-    <!-- ===== SCAN MODAL ===== -->
+    <!-- Scan Modal -->
     <div id="actionModalScan" class="fixed inset-0 bg-slate-900/90 z-50 hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-start pt-10">
         <div class="w-full max-w-md px-6 mb-4 flex justify-between items-center text-white">
             <h3 class="text-xl font-black tracking-wide">Scan QR Code</h3>
@@ -852,7 +931,7 @@
         </div>
     </div>
 
-    <!-- ===== BULK MODAL ===== -->
+    <!-- Bulk Modal -->
     <div id="actionModalBulk" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -870,7 +949,7 @@
         </div>
     </div>
 
-    <!-- ===== GIFT MODAL ===== -->
+    <!-- Gift Modal -->
     <div id="actionModalGift" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] border-t border-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -894,7 +973,7 @@
         </div>
     </div>
 
-    <!-- ===== KEEPER (VAULT) MODAL ===== -->
+    <!-- Keeper (Vault) Modal -->
     <div id="actionModalKeeper" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-2xl border-t border-gray-100">
             <div class="flex justify-between items-center mb-6">
@@ -935,7 +1014,7 @@
         </div>
     </div>
 
-    <!-- ===== CUSTOM ID MODAL ===== -->
+    <!-- Custom ID Modal -->
     <div id="customIdModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-sm rounded-3xl p-6 transform transition-transform duration-300 scale-95 shadow-2xl border border-gray-100 text-center relative">
             <button onclick="document.getElementById('customIdModal').classList.add('opacity-0'); setTimeout(()=>document.getElementById('customIdModal').classList.add('hidden'),300);" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
@@ -947,7 +1026,7 @@
         </div>
     </div>
 
-    <!-- ===== PUBLIC LIFAFA ===== -->
+    <!-- Public Lifafa -->
     <div id="public-lifafa-wrapper" class="fixed inset-0 bg-white z-[100] hidden flex-col items-center justify-center p-6 pb-20 overflow-y-auto bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
         <div class="w-full max-w-sm relative">
             <button onclick="resetPublicLifafa(); window.history.replaceState({}, document.title, '/');" class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center shadow-sm z-10"><i class="fas fa-times"></i></button>
@@ -996,13 +1075,13 @@
         </div>
     </div>
 
-    <!-- ===== TOAST ===== -->
+    <!-- Toast -->
     <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl z-[100] hidden opacity-0 transition-opacity duration-300 flex items-center gap-3 border border-gray-700">
         <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs"><i class="fas fa-info"></i></div>
         <span id="toastMsg" class="font-bold text-sm tracking-wide">Message</span>
     </div>
 
-    <!-- ===== TXN MODAL ===== -->
+    <!-- Transaction Modal -->
     <div id="txnModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden opacity-0 transition-opacity duration-300 flex items-end justify-center pb-0 sm:pb-6">
         <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 transform transition-transform duration-300 translate-y-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] max-h-[90vh] overflow-y-auto no-scrollbar border border-gray-100">
             <div class="flex justify-between items-start mb-6">
@@ -1057,7 +1136,7 @@
         </div>
     </div>
 
-    <!-- ===== TXN RESULT OVERLAY ===== -->
+    <!-- Transaction Result Overlay -->
     <div id="txn-result-overlay" class="fixed inset-0 bg-white z-[100] hidden flex-col items-center justify-between py-10 px-6">
         
         <div id="rocket-overlay" class="absolute inset-0 bg-white z-0 hidden flex-col items-center justify-end overflow-hidden">
@@ -1117,9 +1196,15 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="script.js"></script>
 
-    <!-- Additional script for sidebar toggle and header sync -->
+    <!-- Additional script for sidebar and header sync -->
     <script>
-        // Toggle sidebar (mobile)
+        // Hide splash
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 500);
+        }, 1500);
+
+        // Toggle sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('permanentSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -1137,13 +1222,14 @@
         document.getElementById('sidebarOverlay').addEventListener('click', closeSidebarMobile);
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebarMobile(); });
 
-        // Update header user name and avatar (to sync with script.js)
+        // Update header user
         function updateHeaderUser(name) {
             document.getElementById('headerUserName').textContent = name || 'User';
             const avatarText = document.getElementById('headerAvatarText');
             if (name && name.length > 0) avatarText.textContent = name.charAt(0).toUpperCase();
         }
         window.updateHeaderUser = updateHeaderUser;
+
         function updateHeaderAvatar(imgSrc) {
             const img = document.getElementById('headerAvatarImg');
             const text = document.getElementById('headerAvatarText');
@@ -1155,9 +1241,7 @@
         }
         window.updateHeaderAvatar = updateHeaderAvatar;
 
-        // If script.js already defines showView, we keep that; otherwise, we provide a fallback.
-        // But we keep the original showView from script.js, which should already be defined.
-        // This is just to prevent errors if script.js hasn't loaded.
+        // Fallback showView if script.js doesn't define it
         if (typeof showView === 'undefined') {
             window.showView = function(viewId) {
                 document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
@@ -1166,14 +1250,6 @@
                 closeSidebarMobile();
             };
         }
-
-        // Ensure auth wrapper shows if not logged in (script.js handles this)
-        // The auth wrapper has class 'hidden' initially; script.js will show it if needed.
-        // But if script.js is missing, we show it.
-        if (typeof processLogin === 'undefined') {
-            // No script.js? Show auth.
-            document.getElementById('auth-wrapper').classList.remove('hidden');
-        }
     </script>
 </body>
-                                    </html>
+</html>
